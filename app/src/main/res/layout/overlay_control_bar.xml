@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="56dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:background="@drawable/bg_glass_pill"
+    android:elevation="6dp">
+
+    <ImageButton
+        android:id="@+id/overlaySpeakButton"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_circle_icon"
+        android:padding="8dp"
+        android:src="@drawable/ic_speaker"
+        android:contentDescription="Speak reply" />
+
+    <ImageButton
+        android:id="@+id/overlayMicButton"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_circle_icon_active"
+        android:padding="10dp"
+        android:tint="@color/white"
+        android:src="@drawable/ic_mic"
+        android:contentDescription="Voice command" />
+
+    <ImageButton
+        android:id="@+id/overlayStopButton"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:background="@drawable/bg_circle_icon"
+        android:padding="9dp"
+        android:src="@drawable/ic_stop"
+        android:contentDescription="Stop" />
+
+</LinearLayout>

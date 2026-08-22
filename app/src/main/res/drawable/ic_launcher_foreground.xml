@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptive icon foreground — same glyph as ic_lenspilot_logo, scaled to
+     the 108dp adaptive-icon canvas with its safe zone respected (glyph
+     kept within the inner ~66dp so it isn't clipped by the OS mask). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Target ring -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5"
+        android:pathData="M54,34 A20,20 0 1,1 53.9,34 Z" />
+
+    <!-- Pointer/cursor tapping the target -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,52 L82,59.5 L72,64.2 L78.5,76 L72,79.5 L65.5,67.7 L58.5,75 Z" />
+
+    <!-- Center dot -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,54 m-5.5,0 a5.5,5.5 0 1,1 11,0 a5.5,5.5 0 1,1 -11,0" />
+</vector>

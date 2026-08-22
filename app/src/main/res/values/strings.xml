@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">Lenspilot</string>
+    <string name="splash_tagline">Your AI Screen Guide</string>
+    <string name="splash_credit">Created by Hemel</string>
+
+    <string name="signin_prompt">Sign in to get started</string>
+    <string name="signin_subtitle">Lenspilot guides you through any app or screen, step by step.</string>
+    <string name="signin_with_google">Continue with Google</string>
+    <string name="signout">Sign out</string>
+    <string name="signin_welcome">Welcome, %1$s</string>
+    <string name="signin_failed">Sign-in failed: %1$s</string>
+
+    <!-- Firebase console -> Project settings -> General tab -> "Project number" -->
+    <string name="cloud_project_number" translatable="false">880093407478</string>
+    <!-- Your Hugging Face Space URL, no trailing slash -->
+    <string name="space_base_url" translatable="false">https://hemel24-downloadmessengerapk.hf.space</string>
+
+    <string name="test_backend">Test Backend Connection</string>
+    <string name="testing_in_progress">Connecting…</string>
+    <string name="main_placeholder_note">Chat, live voice, and on-screen guidance arrive in the next build phase.</string>
+
+    <string name="accessibility_service_description">Lets Lenspilot read what\'s on your screen (button labels, text, layout) so it can highlight where to tap and guide you step by step. Lenspilot only reads the screen — it does not tap, type, or take any action on its own unless you explicitly enable automation.</string>
+
+    <!-- Chat screen -->
+    <string name="chat_empty_state">How can I help you today?</string>
+    <string name="chat_input_hint">লিখুন…</string>
+    <string name="chat_send">Send</string>
+    <string name="chat_history_title">History</string>
+    <string name="chat_history_empty">No past conversations yet.</string>
+    <string name="chat_new_chat">নতুন চ্যাট</string>
+
+    <string name="workflow_run">Run</string>
+    <string name="workflow_step_count">%1$d ধাপ</string>
+    <string name="workflow_running">চলছে…</string>
+    <string name="workflow_open_home">হোম স্ক্রিনে যাচ্ছি…</string>
+    <string name="workflow_need_accessibility">প্রথমে Accessibility চালু করো, তারপর আবার Run চাপো</string>
+    <string name="workflow_done">কাজ শেষ ✅</string>
+
+    <string name="mic_permission_needed">ভয়েস কমান্ডের জন্য মাইক্রোফোন অনুমতি দরকার</string>
+    <string name="mic_listening">শুনছি…</string>
+    <string name="mic_transcribing">লিখে নিচ্ছি…</string>
+</resources>
+

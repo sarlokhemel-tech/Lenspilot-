@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- App mark: a rounded-square badge with a soft blue->violet gradient
+     and a white "guided tap" glyph (target ring + pointer), used on the
+     splash screen and sign-in screen. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <path android:pathData="M14,32 A18,18 0 0,1 32,14 L88,14 A18,18 0 0,1 106,32 L106,88 A18,18 0 0,1 88,106 L32,106 A18,18 0 0,1 14,88 Z">
+        <aapt:attr xmlns:aapt="http://schemas.android.com/aapt" name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="14" android:startY="14"
+                android:endX="106" android:endY="106"
+                android:startColor="#2563EB"
+                android:endColor="#8B5CF6" />
+        </aapt:attr>
+    </path>
+
+    <!-- Target ring (the screen/area being guided) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5.5"
+        android:pathData="M60,38 A22,22 0 1,1 59.9,38 Z" />
+
+    <!-- Pointer/cursor tapping the target -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M66,58 L90,66 L79,71 L86,84 L79,88 L72,75 L64,83 Z" />
+
+    <!-- Center dot -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,60 m-6,0 a6,6 0 1,1 12,0 a6,6 0 1,1 -12,0" />
+</vector>
