@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Colab Browser</string>
+    <string name="accessibility_service_desc">Colab Browser session background-এ চালু রাখতে সাহায্য করে। Created by Hemel.</string>
+</resources>
