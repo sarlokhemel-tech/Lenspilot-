@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Standard multi-color Google "G" mark for the sign-in button. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp" android:height="20dp"
+    android:viewportWidth="48" android:viewportHeight="48">
+    <path android:fillColor="#4285F4"
+        android:pathData="M45.12,24.5C45.12,22.88 44.98,21.32 44.7,19.82L24,19.82L24,28.68L36.02,28.68C35.5,31.42 33.94,33.74 31.6,35.3L31.6,40.9L38.64,40.9C42.74,37.14 45.12,31.36 45.12,24.5Z" />
+    <path android:fillColor="#34A853"
+        android:pathData="M24,46C29.88,46 34.82,44.06 38.64,40.9L31.6,35.3C29.66,36.62 27.14,37.42 24,37.42C18.36,37.42 13.56,33.64 11.84,28.56L4.58,28.56L4.58,34.34C8.38,41.94 15.62,46 24,46Z" />
+    <path android:fillColor="#FBBC05"
+        android:pathData="M11.84,28.56C11.4,27.24 11.14,25.84 11.14,24.4C11.14,22.96 11.4,21.56 11.84,20.24L11.84,14.46L4.58,14.46C3.08,17.44 2.24,20.8 2.24,24.4C2.24,28 3.08,31.36 4.58,34.34L11.84,28.56Z" />
+    <path android:fillColor="#EA4335"
+        android:pathData="M24,11.38C27.42,11.38 30.48,12.56 32.9,14.86L38.82,8.94C34.8,5.2 29.88,3 24,3C15.62,3 8.38,7.06 4.58,14.46L11.84,20.24C13.56,15.16 18.36,11.38 24,11.38Z" />
+</vector>

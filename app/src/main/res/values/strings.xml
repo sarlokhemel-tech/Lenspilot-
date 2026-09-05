@@ -1,0 +1,105 @@
+<resources>
+    <string name="app_name">Lenspilot</string>
+    <string name="splash_tagline">Your AI Screen Guide</string>
+    <string name="splash_credit">Created by Hemel</string>
+
+    <string name="signin_prompt">Sign in to get started</string>
+    <string name="signin_subtitle">Lenspilot guides you through any app or screen, step by step.</string>
+    <string name="signin_with_google">Continue with Google</string>
+    <string name="signout">Sign out</string>
+    <string name="signin_welcome">Welcome, %1$s</string>
+    <string name="signin_failed">Sign-in failed: %1$s</string>
+
+    <!-- Firebase console -> Project settings -> General tab -> "Project number" -->
+    <string name="cloud_project_number" translatable="false">880093407478</string>
+    <!-- Your Hugging Face Space URL, no trailing slash -->
+    <string name="space_base_url" translatable="false">https://hemel24-downloadmessengerapk.hf.space</string>
+
+    <string name="test_backend">Test Backend Connection</string>
+    <string name="testing_in_progress">Connecting…</string>
+    <string name="main_placeholder_note">Chat, live voice, and on-screen guidance arrive in the next build phase.</string>
+
+    <!-- Ad-reward token economy -->
+    <!-- AdMob rewarded ad unit — the token top-up ad. The AdMob App ID
+         itself lives in AndroidManifest.xml (APPLICATION_ID meta-data). -->
+    <string name="reward_ad_unit_id" translatable="false">ca-app-pub-7007962993307475/8751457637</string>
+    <string name="tokens_input_label">ইনপুট</string>
+    <string name="tokens_output_label">আউটপুট</string>
+    <string name="get_tokens_button">টোকেন নিন</string>
+    <string name="token_limit_title">টোকেন শেষ হয়ে গেছে</string>
+    <string name="token_limit_body">চালিয়ে যেতে বিজ্ঞাপন দেখে বিনামূল্যে টোকেন সংগ্রহ করো।</string>
+    <string name="token_limit_watch_ad">বিজ্ঞাপন দেখুন</string>
+    <string name="token_limit_cancel">বাতিল</string>
+    <string name="ad_break_title">🎉 টোকেন পেয়েছো!</string>
+    <string name="ad_break_watch_more">➕ আরও দেখুন, আরও টোকেন নিন</string>
+    <string name="ad_break_stop">এখন থাক</string>
+    <string name="ad_break_suggestion">কমপক্ষে ৪টি বিজ্ঞাপন দেখার পরামর্শ দেওয়া হচ্ছে (বাধ্যতামূলক নয়) — যতবার খুশি দেখতে পারো।</string>
+    <string name="ad_break_watched_count">এই সেশনে দেখা হয়েছে: %1$d টি</string>
+    <string name="ad_loading">বিজ্ঞাপন লোড হচ্ছে…</string>
+    <string name="ad_failed">বিজ্ঞাপন এখন দেখানো যাচ্ছে না, একটু পর আবার চেষ্টা করো</string>
+
+    <string name="accessibility_service_description">Lets Lenspilot read what\'s on your screen (button labels, text, layout) so it can highlight where to tap and guide you step by step. Lenspilot only reads the screen — it does not tap, type, or take any action on its own unless you explicitly enable automation.</string>
+    <string name="accessibility_choice_title">Accessibility — ঐচ্ছিক, তবে দ্রুত</string>
+    <string name="accessibility_choice_body">Lenspilot দুইভাবেই কাজ করে:\n\n✅ Accessibility চালু থাকলে — স্ক্রিন সরাসরি ও দ্রুত পড়া যায় (accessibility tree), তাই গাইডলাইন প্রায় সাথে সাথে আসে।\n\n➖ Accessibility বন্ধ রাখলে — অ্যাপ তখনও কাজ করবে, তবে on-device ছবি-শনাক্তকরণ (icon detection) ও টেক্সট রিকগনিশন দিয়ে স্ক্রিন বুঝতে হয় বলে একটু ধীর হতে পারে। তখন স্ক্রিনশট নেওয়ার জন্য এক-বারের screen-capture অনুমতি আর হাইলাইট আঁকার জন্য \"অন্য অ্যাপের উপর দেখানো\" অনুমতি লাগবে — এগুলো ভিন্ন দুইটা পারমিশন, Accessibility-এর বদলি না।\n\nAccessibility না দিলেও পুরো অ্যাপ ব্যবহার করা যাবে — শুধু speed-এ পার্থক্য থাকবে। ইচ্ছা না হলে এখনই ignore করে এগিয়ে যেতে পারো, পরে সেটিংস থেকে যেকোনো সময় চালু/বন্ধ করা যাবে।</string>
+    <string name="accessibility_choice_enable">Accessibility চালু করি</string>
+    <string name="accessibility_choice_skip">এখন থাক (ignore)</string>
+    <string name="fallback_mode_notice">Accessibility বন্ধ — ধীরগতির ফলব্যাক মোডে চলছে</string>
+
+    <!-- Chat screen -->
+    <string name="chat_empty_state">How can I help you today?</string>
+    <string name="chat_input_hint">লিখুন…</string>
+    <string name="chat_send">Send</string>
+    <string name="chat_history_title">History</string>
+    <string name="chat_history_empty">No past conversations yet.</string>
+    <string name="chat_new_chat">নতুন চ্যাট</string>
+
+    <string name="workflow_run">Run</string>
+    <string name="workflow_step_count">%1$d ধাপ</string>
+    <string name="workflow_running">চলছে…</string>
+    <string name="workflow_open_home">হোম স্ক্রিনে যাচ্ছি…</string>
+    <string name="workflow_need_accessibility">প্রথমে Accessibility চালু করো, তারপর আবার Run চাপো</string>
+    <string name="workflow_done">কাজ শেষ ✅</string>
+
+    <string name="mic_permission_needed">ভয়েস কমান্ডের জন্য মাইক্রোফোন অনুমতি দরকার</string>
+    <string name="mic_listening">শুনছি…</string>
+    <string name="mic_transcribing">লিখে নিচ্ছি…</string>
+
+    <!-- Settings (kept in English by request, regardless of app language) -->
+    <string name="settings">Settings</string>
+    <string name="setting_auto_speak_title">Always speak guidance aloud</string>
+    <string name="setting_auto_speak_desc">When on, guidance is read aloud as soon as it\'s ready — no need to tap the speaker button</string>
+    <string name="setting_voice_first_title">Voice command on app launch</string>
+    <string name="setting_voice_first_desc">When on, opening the app shows a large voice ball — speak and the workflow starts right away</string>
+    <string name="setting_support_report_title">Support report</string>
+    <string name="setting_support_report_desc">Report a bad or broken AI response, attach a screenshot, and send it for review</string>
+
+    <!-- Report flow (Settings-adjacent, kept in English) -->
+    <string name="report_dialog_title">Report an issue</string>
+    <string name="report_reported_message_label">Reported message</string>
+    <string name="report_description_hint">Describe what went wrong…</string>
+    <string name="report_attach_screenshot">Attach screenshot</string>
+    <string name="report_screenshot_attached">Screenshot attached</string>
+    <string name="report_remove_screenshot">Remove</string>
+    <string name="report_submit">Submit report</string>
+    <string name="report_cancel">Cancel</string>
+    <string name="report_description_required">Please describe the issue</string>
+    <string name="report_sending">Sending report…</string>
+    <string name="report_sent">Report sent. Thank you.</string>
+    <string name="report_failed">Couldn\'t send report: %1$s</string>
+    <string name="cd_report_message">Report this response</string>
+
+    <!-- History (list of past conversations) -->
+    <string name="history_empty_title">No conversations yet</string>
+    <string name="history_empty_subtitle">Your past chats will show up here</string>
+    <string name="history_item_workflow_prefix">Workflow</string>
+    <string name="history_item_chat_prefix">Chat</string>
+
+    <!-- Voice-first launch overlay -->
+    <string name="voice_first_tap_hint">বলে দিন কী করতে চান</string>
+    <string name="voice_first_listening">শুনছি…</string>
+    <string name="voice_first_sending">পাঠানো হচ্ছে…</string>
+    <string name="cd_voice_first_ball">ভয়েস কমান্ড দিন</string>
+    <string name="cd_close_voice_first">চ্যাট বক্সে যান</string>
+</resources>
+
+

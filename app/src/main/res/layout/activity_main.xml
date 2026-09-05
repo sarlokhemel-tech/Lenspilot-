@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light">
+
+    <!-- ===================== SIGN-IN SCREEN ===================== -->
+    <LinearLayout
+        android:id="@+id/signInSection"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@drawable/ic_lenspilot_logo"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="@string/signin_prompt"
+            android:textColor="@color/text_primary_light"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/subtitleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/signin_subtitle"
+            android:textColor="@color/text_secondary_light"
+            android:textSize="14sp"
+            android:gravity="center" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/signInButton"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_marginTop="28dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="24dp"
+            android:background="@drawable/bg_button_google"
+            android:text="@string/signin_with_google"
+            android:textColor="#3C4043"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif-medium"
+            android:drawableStart="@drawable/ic_google_logo"
+            android:drawablePadding="12dp"
+            android:elevation="1dp"
+            android:stateListAnimator="@null"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
+    <!-- ===================== CHAT SCREEN ===================== -->
+    <LinearLayout
+        android:id="@+id/chatSection"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Top bar: history | title | new-chat | profile -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp">
+
+            <ImageButton
+                android:id="@+id/historyButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="8dp"
+                android:src="@drawable/ic_history"
+                android:contentDescription="@string/chat_history_title" />
+
+            <!-- Icon-only shortcut for "app খুললেই ভয়েস কমান্ড" — no label,
+                 just a button, right at the top of the app, so it doesn't
+                 need to live inside the Settings dialog anymore. Tapping
+                 toggles the setting AND, when turning it on, jumps
+                 straight into the voice-first ball immediately. -->
+            <ImageButton
+                android:id="@+id/voiceFirstToggleButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/historyButton"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="8dp"
+                android:src="@drawable/ic_mic"
+                android:contentDescription="অ্যাপ খুললেই ভয়েস কমান্ড" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/app_name"
+                android:textColor="@color/text_primary_light"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/speakButton"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/newChatButton"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="7dp"
+                android:src="@drawable/ic_speaker"
+                android:contentDescription="Speak reply" />
+
+            <ImageButton
+                android:id="@+id/newChatButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/profileButton"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="8dp"
+                android:src="@drawable/ic_add"
+                android:contentDescription="@string/chat_new_chat" />
+
+            <ImageButton
+                android:id="@+id/profileButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="8dp"
+                android:src="@drawable/ic_profile"
+                android:contentDescription="Profile" />
+        </RelativeLayout>
+
+        <!-- Token bar: current input/output balance + "get tokens" icon.
+             See com.hemel.lenspilot.ads (TokenWallet, RewardedAdManager,
+             AdBreakActivity) for the ad-reward economy behind this. -->
+        <LinearLayout
+            android:id="@+id/tokenBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="6dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_workflow_card"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
+
+                <TextView
+                    android:id="@+id/tokenInputText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ইনপুট: —"
+                    android:textColor="@color/text_secondary_light"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="•"
+                    android:textColor="@color/border_light" />
+
+                <TextView
+                    android:id="@+id/tokenOutputText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="আউটপুট: —"
+                    android:textColor="@color/text_secondary_light"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp">
+
+                <ImageButton
+                    android:id="@+id/getTokensButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_circle_icon"
+                    android:padding="7dp"
+                    android:src="@drawable/ic_token"
+                    android:contentDescription="@string/get_tokens_button" />
+
+                <View
+                    android:id="@+id/tokenLowDot"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="top|end"
+                    android:background="@drawable/bg_red_dot"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- NOTE: the old speak/mic/stop control ROW that used to live
+             here has been removed on purpose — those 3 icons now only
+             ever appear as the floating overlay control bar (see
+             overlay_control_bar.xml), and only while a workflow is
+             actually running on-screen, outside the app. Regular voice
+             dictation for composing a chat message lives in the input
+             row below (micButton) instead, unchanged behavior. -->
+
+        <TextView
+            android:id="@+id/voiceStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/text_secondary_light"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:layout_marginTop="2dp" />
+
+        <!-- Accessibility onboarding banner -->
+        <LinearLayout
+            android:id="@+id/accessibilityCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:padding="12dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_workflow_card"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/workflow_need_accessibility"
+                android:textColor="@color/text_primary_light"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/enableAccessibilityButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_button_secondary"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:text="Enable"
+                android:textAllCaps="false"
+                android:textColor="@color/text_primary_light" />
+        </LinearLayout>
+
+        <!-- Chat messages + empty state -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/chatRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp" />
+
+            <TextView
+                android:id="@+id/emptyStateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/chat_empty_state"
+                android:textColor="@color/text_muted_light"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </FrameLayout>
+
+        <!-- Screenshot attachment preview (Gemini-style "+" chip) — shown
+             only while an image is staged to go out with the next message. -->
+        <LinearLayout
+            android:id="@+id/attachmentPreviewRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="4dp"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="56dp"
+                android:layout_height="56dp">
+
+                <ImageView
+                    android:id="@+id/attachmentThumbnail"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/bg_input_field"
+                    android:contentDescription="Attached screenshot" />
+
+                <ImageButton
+                    android:id="@+id/attachmentRemoveButton"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="top|end"
+                    android:background="@drawable/bg_close_chip"
+                    android:padding="3dp"
+                    android:src="@drawable/ic_close"
+                    android:contentDescription="Remove attachment" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- Input row: attach (+) | text | mic (dictate) | send -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="10dp">
+
+            <ImageButton
+                android:id="@+id/attachButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="9dp"
+                android:src="@drawable/ic_add"
+                android:contentDescription="সমস্যার স্ক্রিনশট যোগ করো" />
+
+            <EditText
+                android:id="@+id/messageInput"
+                android:layout_width="0dp"
+                android:layout_height="46dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_input_field"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:hint="@string/chat_input_hint"
+                android:textColor="@color/text_primary_light"
+                android:textColorHint="@color/text_muted_light"
+                android:textSize="15sp"
+                android:maxLines="4"
+                android:inputType="textMultiLine|textCapSentences" />
+
+            <ImageButton
+                android:id="@+id/micButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="9dp"
+                android:src="@drawable/ic_mic"
+                android:contentDescription="Voice command" />
+
+            <ImageButton
+                android:id="@+id/sendButton"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="@drawable/bg_circle_icon_active"
+                android:padding="12dp"
+                android:src="@drawable/ic_send"
+                android:contentDescription="@string/chat_send" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <include
+        layout="@layout/overlay_voice_first"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

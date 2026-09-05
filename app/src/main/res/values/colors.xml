@@ -1,0 +1,40 @@
+<resources>
+    <!-- Highlight semantic colors (used ONLY for the on-screen guidance
+         overlay — unrelated to app UI background, left unchanged) -->
+    <color name="primary_action">#2563EB</color>
+    <color name="confirm_success">#10B981</color>
+    <color name="warning_caution">#F59E0B</color>
+    <color name="danger_destructive">#EF4444</color>
+    <color name="input_field">#8B5CF6</color>
+    <color name="navigation">#14B8A6</color>
+
+    <!-- App surface palette — WHITE / light theme -->
+    <color name="background_light">#FFFFFF</color>
+    <color name="surface_light">#F5F7FA</color>
+    <color name="surface_elevated_light">#FFFFFF</color>
+    <color name="border_light">#E2E8F0</color>
+    <color name="text_primary_light">#0F172A</color>
+    <color name="text_secondary_light">#64748B</color>
+    <color name="text_muted_light">#94A3B8</color>
+    <color name="chat_bubble_user">#2563EB</color>
+    <color name="chat_bubble_ai">#F1F5F9</color>
+
+    <!-- Kept for old references still in code (highlight overlay label text,
+         etc.) so nothing that depended on the old dark palette breaks. -->
+    <color name="background_dark">#FFFFFF</color>
+    <color name="surface_dark">#F5F7FA</color>
+    <color name="surface_elevated">#FFFFFF</color>
+    <color name="border_subtle">#E2E8F0</color>
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="text_muted">#94A3B8</color>
+
+    <!-- Brand gradient endpoints (Sapphire -> Royal Violet) -->
+    <color name="brand_gradient_start">#2563EB</color>
+    <color name="brand_gradient_end">#8B5CF6</color>
+
+    <color name="ic_launcher_background">#FFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent_icon_layer">#00000000</color>
+</resources>

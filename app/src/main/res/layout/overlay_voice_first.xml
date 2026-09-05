@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shown instead of the chat screen when Prefs.voiceFirstLaunch is on.
+     Tapping the ball starts live speech-to-text (android.speech.
+     SpeechRecognizer — converts speech to text as you talk, not a
+     record-then-upload audio file); when you stop talking, the
+     recognized text is sent straight into the plan+run pipeline
+     automatically, no Run tap needed. The × just switches to the normal
+     chat screen for this app session — the overlay comes back next time
+     the app opens, until the setting itself is turned off. -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/voiceFirstOverlay"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light"
+    android:visibility="gone"
+    android:elevation="20dp">
+
+    <ImageButton
+        android:id="@+id/voiceFirstCloseButton"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="18dp"
+        android:background="@drawable/bg_close_chip"
+        android:padding="10dp"
+        android:src="@drawable/ic_close"
+        android:contentDescription="@string/cd_close_voice_first"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageButton
+        android:id="@+id/voiceFirstBall"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:background="@drawable/bg_voice_ball"
+        android:padding="52dp"
+        android:src="@drawable/ic_mic"
+        android:tint="@color/white"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/cd_voice_first_ball"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/voiceFirstCaption"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.42" />
+
+    <TextView
+        android:id="@+id/voiceFirstStatusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/voice_first_tap_hint"
+        android:textColor="@color/text_secondary_light"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/voiceFirstBall"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/voiceFirstCaption"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        android:textColor="@color/text_primary_light"
+        android:textSize="17sp"
+        android:textAlignment="center"
+        android:minHeight="60dp"
+        app:layout_constraintTop_toBottomOf="@id/voiceFirstStatusText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.15" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

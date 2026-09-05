@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Android 11+ (API 30+) package-visibility: without declaring these,
+         the app cannot see/bind to the on-device TextToSpeech engine or
+         SpeechRecognizer service even when one is installed — TextToSpeech
+         init silently reports ERROR and SpeechRecognizer.isRecognitionAvailable()
+         silently returns false, with no exception and no user-facing error.
+         This is the root cause of "TTS/voice কাজ করছে না" on API 30+ devices
+         (targetSdk 34 here, well past the threshold). -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+        <intent>
+            <action android:name="android.speech.action.RECOGNIZE_SPEECH" />
+        </intent>
+        <!-- AdMob's SDK needs to see the Play Store app to open ads that
+             deep-link out to it (e.g. "install this app" reward ads). -->
+        <package android:name="com.android.vending" />
+    </queries>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Tier 2/3 fallback path (Accessibility not enabled): capturing a
+         screenshot needs MediaProjection, and drawing the highlight
+         overlay on top of other apps needs SYSTEM_ALERT_WINDOW — the
+         non-accessibility route trades one permission for two others,
+         it isn't permission-free (see onboarding copy in strings.xml). -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Lenspilot"
+        android:supportsRtl="true">
+
+        <!-- AdMob app id — required once anywhere in the manifest for the
+             SDK to initialize at all (separate from the per-ad-unit id used
+             when actually loading a rewarded ad, see reward_ad_unit_id). -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-7007962993307475~4149490347" />
+
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Lenspilot.Splash">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+
+        <!-- Full-screen "watch more / get more tokens" break page shown
+             right after each rewarded ad finishes (see ads/AdBreakActivity). -->
+        <activity
+            android:name=".ads.AdBreakActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Lenspilot" />
+
+        <!-- Quick Settings tile trampoline (API < 34 only — collapseStatusBar()
+             covers 34+ directly). Invisible, excluded from recents/task
+             switcher, no launcher entry — its only purpose is closing the
+             QS shade before the tile's screen scan runs. See class kdoc. -->
+        <activity
+            android:name=".QuickScanTrampolineActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Lenspilot.Invisible"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:launchMode="singleInstance" />
+
+        <!-- TIER 1 screen-reading + highlight overlay. The user must turn
+             this on manually from Android Settings -> Accessibility; apps
+             cannot self-enable it (OS-level protection). -->
+        <service
+            android:name=".accessibility.LenspilotAccessibilityService"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
+        <!-- TIER 2 fallback (no Accessibility): hosts the MediaProjection
+             session used to grab a screenshot for ML Kit OCR. Android
+             requires a visible notification and a
+             declared foregroundServiceType while a MediaProjection is
+             active — this is an OS-level disclosure requirement, not
+             optional, so the user always knows capture is happening. -->
+        <service
+            android:name=".vision.ScreenCaptureService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
+
+        <!-- Hosts the workflow loop + overlay UI (control bar, trigger
+             bubble, highlight rendering) when Accessibility is off —
+             the Tier 2/3 counterpart of LenspilotAccessibilityService.
+             No special foregroundServiceType needed here (it doesn't
+             itself touch MediaProjection or the mic continuously — that's
+             ScreenCaptureService's job; this one just orchestrates). -->
+        <service
+            android:name=".vision.FallbackGuideService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="on_screen_guidance_without_accessibility" />
+        </service>
+
+        <!-- Quick Settings tile — the shortcut in the pull-down shade
+             (next to Wi-Fi/data) that scans the current screen directly,
+             without opening the app. -->
+        <service
+            android:name=".QuickTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_mic"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+    </application>
+
+</manifest>
