@@ -1,0 +1,66 @@
+name: Build Lenspilot APK
+
+# কম্পিউটার/রুট অ্যাক্সেস ছাড়াই APK বানানোর জন্য — main-এ push হলেই
+# স্বয়ংক্রিয়ভাবে চলবে, আর চাইলে Actions ট্যাব থেকে ম্যানুয়ালিও
+# (workflow_dispatch) চালানো যাবে। শেষে debug APK-টা "Artifacts" হিসেবে
+# ডাউনলোড করা যাবে।
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    name: Assemble debug APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # গ্র্যাডল rootProject build.gradle.kts / app/build.gradle.kts অনুযায়ী
+      # JDK 17 লাগবে (sourceCompatibility/jvmTarget = 17)।
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      # প্রতিটা build নতুন করে ডাউনলোড না করে গ্র্যাডল/AGP ডিপেন্ডেন্সি
+      # cache করে রাখে — দ্বিতীয়বার থেকে build অনেক দ্রুত হবে।
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      # app/google-services.json ইতিমধ্যেই রিপোতে আছে (README অনুযায়ী),
+      # আর debug keystore (keystore/debug.keystore) স্থায়ীভাবে কমিট করা —
+      # তাই SHA-1 প্রতি build-এ বদলায় না, আলাদা করে সাইনিং সেটআপেরও দরকার
+      # নেই এখানে।
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Locate APK
+        id: apk
+        run: |
+          APK_PATH=$(find app/build/outputs/apk/debug -name "*.apk" | head -n 1)
+          echo "APK built at: $APK_PATH"
+          echo "path=$APK_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lenspilot-debug-apk
+          path: ${{ steps.apk.outputs.path }}
+          if-no-files-found: error
+          retention-days: 14

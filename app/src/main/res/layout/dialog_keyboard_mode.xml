@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/keyboardModeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/keyboard_mode_title"
+        android:textColor="@color/text_primary_light"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/keyboardModeBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/text_secondary_light"
+        android:textSize="13.5sp"
+        android:lineSpacingExtra="2dp" />
+
+    <TextView
+        android:id="@+id/keyboardModeSettingsHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/keyboard_mode_settings_hint"
+        android:textColor="@color/text_muted_light"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/keyboardModePrimaryButton"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/bg_button_primary"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:text="@string/keyboard_mode_open_settings" />
+
+    <Button
+        android:id="@+id/keyboardModeSecondaryButton"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_button_secondary"
+        android:textAllCaps="false"
+        android:textColor="@color/text_primary_light"
+        android:text="@string/keyboard_mode_switch_now"
+        android:visibility="gone" />
+
+</LinearLayout>

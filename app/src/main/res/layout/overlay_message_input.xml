@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- মেসেজ ইনপুট গ্লাস কার্ড — কন্ট্রোল প্যানেলের ডান পাশের আইকনে চাপ
+     দিলে এটা খোলে। প্রস্থ শুরুতে ছোট (শুধু EditText-এর minWidth),
+     ইউজার যত লিখবে তত বড় হয় — কারণ এই ভিউটা নিজেই একটা আলাদা
+     WindowManager overlay window (params.width = WRAP_CONTENT), তাই
+     EditText-এর টেক্সট বদলালে স্বাভাবিক requestLayout()-এই window-টা
+     নিজে থেকে রিসাইজ হয়ে যায় — আলাদা করে width ম্যানুয়ালি বসাতে হয় না।
+     maxWidth স্ক্রিনের বেশিরভাগ প্রস্থে ক্যাপ করা, যাতে পুরো স্ক্রিন
+     জুড়ে না যায়। দেখো showMessageInput()/hideMessageInput() -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="14dp"
+    android:paddingEnd="6dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
+    android:background="@drawable/bg_glass_pill"
+    android:elevation="6dp">
+
+    <EditText
+        android:id="@+id/overlayMsgInput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="24dp"
+        android:maxWidth="260dp"
+        android:maxLines="4"
+        android:background="@android:color/transparent"
+        android:hint="লিখো…"
+        android:textColor="@color/text_primary_light"
+        android:textColorHint="@color/text_muted_light"
+        android:textSize="14sp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:inputType="textMultiLine|textCapSentences"
+        android:imeOptions="actionSend" />
+
+    <ImageButton
+        android:id="@+id/overlayMsgSendButton"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="4dp"
+        android:background="@drawable/bg_circle_icon_active"
+        android:padding="8dp"
+        android:src="@drawable/ic_send"
+        android:contentDescription="পাঠাও" />
+
+</LinearLayout>

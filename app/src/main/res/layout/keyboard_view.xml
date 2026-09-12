@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lenspilot Keyboard's own view. This is a NORMAL IME layout — the
+     letter/number keys behave exactly like Google Keyboard (tap to type,
+     shift, backspace, space, enter). No Accessibility permission is used
+     or needed anywhere in this file or the service that inflates it.
+
+     The AI part is fully AUTOMATIC, not a manual "type a prompt" panel:
+     as soon as a text field is focused, if the AI toggle is ON and there
+     is context to go on (the active workflow goal, the field's hint, the
+     app), Lenspilot Keyboard decides what to type on its own and commits
+     it — the user never types a prompt into the keyboard itself. The top
+     row only ever needs to show three things: whether AI auto-typing is
+     currently ON/OFF (tap to pause and take over manually), a Stop
+     button while it's actively typing, and a status line for "thinking"
+     / "needs an answer, use the control bar mic" / "paused, you're
+     typing". There is deliberately NO mic/voice button in this keyboard
+     — voice answers to a clarifying question go through the overlay
+     control bar's own mic (see FallbackGuideService /
+     LenspilotAccessibilityService), never through a second, duplicate
+     mic here. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/keyboardRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/surface_light"
+    android:paddingTop="4dp"
+    android:paddingBottom="6dp">
+
+    <!-- ===================== Top bar: globe / AI toggle / stop / last-reply ===================== -->
+    <LinearLayout
+        android:id="@+id/aiTopBar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginBottom="2dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            android:id="@+id/kbGlobeButton"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:background="@drawable/bg_keyboard_key_special"
+            android:padding="7dp"
+            android:src="@drawable/ic_keyboard_globe"
+            android:contentDescription="@string/cd_keyboard_globe" />
+
+        <!-- Tap to pause/resume AI auto-typing. Label + background swap
+             between the two states in code (see updateAutoTypeToggleUi). -->
+        <LinearLayout
+            android:id="@+id/aiToggleButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:background="@drawable/bg_button_primary">
+
+            <TextView
+                android:id="@+id/aiToggleLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/keyboard_auto_type_on"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
+
+        <!-- Only visible while a generation/typing call is actually in
+             flight — tapping it hands the field back to the user
+             immediately, same as the AI never having been asked. -->
+        <ImageButton
+            android:id="@+id/kbStopButton"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:background="@drawable/bg_keyboard_key_special"
+            android:padding="7dp"
+            android:src="@drawable/ic_stop"
+            android:contentDescription="@string/keyboard_ai_stop"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/kbLastReplyButton"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/bg_keyboard_key_special"
+            android:padding="7dp"
+            android:src="@drawable/ic_history"
+            android:contentDescription="@string/keyboard_ai_use_last_reply" />
+    </LinearLayout>
+
+    <!-- Status line: "AI ভাবছে…", a clarifying question + "control bar
+         মাইকে বলো" hint, or "AI বন্ধ আছে, তুমি লিখছো" — visible only
+         when there's something to say, blank/gone the rest of the time. -->
+    <TextView
+        android:id="@+id/kbStatusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        android:textSize="12sp"
+        android:textColor="@color/text_secondary_light"
+        android:gravity="center"
+        android:visibility="gone" />
+
+    <!-- Letter/number rows are added here programmatically (see
+         LenspilotInputMethodService.buildKeyRows) — plain weighted rows
+         of keys, same idea as any QWERTY keyboard. -->
+    <LinearLayout
+        android:id="@+id/keysContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="2dp"
+        android:paddingEnd="2dp" />
+
+</LinearLayout>
