@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="56dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:background="@drawable/bg_glass_pill"
+    android:elevation="6dp">
+
+    <!-- গ্রিপ হ্যান্ডেল — এটা ধরে পুরো বারটা হাত দিয়ে টেনে সরানো যায়
+         (আগে বারটা একদম ফিক্সড ছিল, কোনো অ্যাপের সার্চ বার/আইকন উপরে
+         থাকলে সেটা ঢেকে ফেলত)। বাকি পাঁচটা বাটনের নিজস্ব ক্লিক আচরণ
+         অক্ষত রাখতে ড্র্যাগ শুধু এই হ্যান্ডেলেই বসানো হয়েছে, পুরো বারে
+         না — দেখো FallbackGuideService/LenspilotAccessibilityService-এর
+         showControlBar()। -->
+    <ImageButton
+        android:id="@+id/overlayDragHandle"
+        android:layout_width="26dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="6dp"
+        android:background="@android:color/transparent"
+        android:padding="6dp"
+        android:src="@drawable/ic_drag_handle"
+        android:contentDescription="টেনে সরাও" />
+
+    <ImageButton
+        android:id="@+id/overlaySpeakButton"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_circle_icon"
+        android:padding="8dp"
+        android:src="@drawable/ic_speaker"
+        android:contentDescription="Speak reply" />
+
+    <ImageButton
+        android:id="@+id/overlayMicButton"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_circle_icon_active"
+        android:padding="10dp"
+        android:tint="@color/white"
+        android:src="@drawable/ic_mic"
+        android:scaleType="fitCenter"
+        android:contentDescription="Voice command" />
+
+    <ImageButton
+        android:id="@+id/overlayStopButton"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/bg_circle_icon"
+        android:padding="9dp"
+        android:src="@drawable/ic_stop"
+        android:contentDescription="Stop" />
+
+    <!-- একদম ডানে মেসেজ আইকন — ✓/× এর বদলে এটাই এখন প্রশ্নের উত্তর বা
+         মাঝপথে নতুন নির্দেশনা দেওয়ার একমাত্র পথ। চাপ দিলে
+         overlay_message_input.xml (গ্লাস কার্ড) খোলে/বন্ধ হয় — দেখো
+         showMessageInput()/hideMessageInput()। সেই কার্ডে যা লেখা হয়
+         তা triggerWorkflowStep(extraContext = text) হিসেবেই যায়, তাই
+         ✓/× যেভাবে চলমান workflow চালিয়ে নিত এটাও ঠিক সেভাবেই নেয় —
+         শুধু হ্যাঁ/না নয়, যেকোনো মুক্ত-টেক্সট উত্তর বা কমান্ড দেওয়া যায়। -->
+    <ImageButton
+        android:id="@+id/overlayMessageButton"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="@drawable/bg_circle_icon"
+        android:padding="8dp"
+        android:src="@drawable/ic_bubble_trigger"
+        android:scaleType="fitCenter"
+        android:contentDescription="লিখে উত্তর দাও / নতুন নির্দেশনা" />
+
+</LinearLayout>

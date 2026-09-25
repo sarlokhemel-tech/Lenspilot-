@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background_light">
+
+    <!-- Top control bar — mirrors the small "Gemini-style" pill the
+         chat input row uses, kept intentionally tiny per spec ("শুধু
+         ওইটুকু" — just that much, nothing more elaborate). -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/surface_light"
+        android:paddingStart="6dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:elevation="2dp">
+
+        <ImageButton
+            android:id="@+id/browserCloseButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_circle_icon"
+            android:padding="9dp"
+            android:src="@drawable/ic_close"
+            android:contentDescription="বন্ধ করো" />
+
+        <!-- Opens the goal row at ANY time — even mid-automation, not
+             only when idle/paused — so the user can hand the AI a new
+             command or answer without having to stop the run first. See
+             AiBrowserActivity.toggleManualMessageRow(). -->
+        <ImageButton
+            android:id="@+id/browserNewMessageButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/bg_circle_icon"
+            android:padding="9dp"
+            android:src="@drawable/ic_browser_new_command"
+            android:contentDescription="ব্রাউজারকে নতুন কমান্ড দাও" />
+
+        <TextView
+            android:id="@+id/browserStatusText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textColor="@color/text_primary_light"
+            android:textSize="13sp"
+            android:text="ম্যানুয়াল মোড — নিজে ব্রাউজ করুন" />
+
+        <!-- ELA 4N-only badge: visible for the whole run whenever this
+             browser session was started with the ELA 4N system-switcher
+             selected, so it's obvious at a glance (not just buried in a
+             one-line status message) that a research-and-verify model is
+             driving this session — see AiBrowserActivity.onCreate() where
+             browserSystem is read from EXTRA_SYSTEM, and
+             updateSystemBadge(). Fixes "বোঝা যাবে যে এখানে ELA 4N মডেল
+             চলতেছে" — before this there was no persistent on-screen sign
+             of which system was running the browser at all. -->
+        <TextView
+            android:id="@+id/browserSystemBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_source_chip"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:text="ELA 4N · তদারকি সক্রিয়"
+            android:textColor="@color/text_secondary_light"
+            android:textStyle="bold"
+            android:textSize="11sp"
+            android:visibility="gone"
+            android:contentDescription="ELA 4N মডেল চলছে, তদারকি সিস্টেম সক্রিয়" />
+
+        <TextView
+            android:id="@+id/browserAiLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:text="AI"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:textColor="@color/navigation" />
+
+        <Switch
+            android:id="@+id/browserAiSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="AI অটোমেশন চালু/বন্ধ" />
+    </LinearLayout>
+
+    <!-- Goal input row — only visible when AI mode is ON but no task is
+         currently running (fresh open, or after task_complete/ask_user).
+         Same three actions the user described: খুঁজে দাও (search),
+         চালু করো (open/play), ইত্যাদি — free text, sent as `goal`. -->
+    <LinearLayout
+        android:id="@+id/browserGoalRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/surface_light"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="8dp"
+        android:visibility="gone">
+
+        <!-- Picked-image preview chip — gone unless an image is attached. -->
+        <LinearLayout
+            android:id="@+id/browserGoalImagePreviewRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="6dp"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="44dp"
+                android:layout_height="44dp">
+
+                <ImageView
+                    android:id="@+id/browserGoalImagePreview"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/bg_input_field" />
+
+                <ImageButton
+                    android:id="@+id/browserGoalImageRemoveButton"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="top|end"
+                    android:background="@drawable/bg_close_chip"
+                    android:padding="3dp"
+                    android:src="@drawable/ic_close"
+                    android:contentDescription="ছবি সরাও" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/browserGoalAttachButton"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="8dp"
+                android:src="@drawable/ic_attach_image"
+                android:contentDescription="ছবি পাঠাও" />
+
+            <EditText
+                android:id="@+id/browserGoalInput"
+                android:layout_width="0dp"
+                android:layout_height="42dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_input_field"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:hint="কী করতে চাও লেখো… (যেমন: Arijit Singh এর Tum Hi Ho চালু করো)"
+                android:textColor="@color/text_primary_light"
+                android:textColorHint="@color/text_muted_light"
+                android:textSize="13sp"
+                android:maxLines="1"
+                android:imeOptions="actionGo"
+                android:inputType="text" />
+
+            <ImageButton
+                android:id="@+id/browserGoalGoButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_circle_icon_active"
+                android:padding="10dp"
+                android:src="@drawable/ic_send"
+                android:contentDescription="শুরু করো" />
+
+            <!-- × — closes this row without submitting anything. Needed
+                 now that browserNewMessageButton can open it ANY time,
+                 including while automation is actively running — the
+                 user must be able to back out without being forced to
+                 either send something or stop the run. -->
+            <ImageButton
+                android:id="@+id/browserGoalCloseButton"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_close_chip"
+                android:padding="7dp"
+                android:src="@drawable/ic_close"
+                android:contentDescription="বন্ধ করো" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/browserProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:max="100"
+        android:progressTint="@color/navigation"
+        android:visibility="gone" />
+
+    <WebView
+        android:id="@+id/aiWebView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

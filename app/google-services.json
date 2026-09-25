@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "880093407478",
+    "project_id": "lenspilot-612c8",
+    "storage_bucket": "lenspilot-612c8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:880093407478:android:2b0cfe567261adf472a4d7",
+        "android_client_info": {
+          "package_name": "com.hemel.lenspilot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "880093407478-d7f75tr6vmrprrrm07or1i4ot5ud211l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hemel.lenspilot",
+            "certificate_hash": "94a4137b498b747bf98bc63e650d41e00e01266d"
+          }
+        },
+        {
+          "client_id": "880093407478-4t8uq4bnlifh32retsl85j5heilo63ut.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvVN7YGL8W_AHZx2LjgUJYpPRBzq9Fes8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "880093407478-4t8uq4bnlifh32retsl85j5heilo63ut.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

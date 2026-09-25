@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ELA 1st's per-reply Run button — deliberately tiny and icon-only
+     (an arrow, not a text "Run" pill): this appears under EVERY AI
+     reply in ELA 1st mode, even a bare "hi", so it has to stay out of
+     the way rather than read like a call-to-action card. Tapping it
+     leaves the app (starts the Accessibility overlay) and sends the
+     ELA_ACT_PROMPT for this turn — see MainActivity.onRunWorkflow /
+     app.py's ELA_ACT_PROMPT. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="end|center_vertical"
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="4dp"
+    android:layout_marginEnd="40dp">
+
+    <TextView
+        android:id="@+id/elaRunStatusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:textColor="@color/text_secondary_light"
+        android:textSize="11sp"
+        android:visibility="gone" />
+
+    <!-- "এই কাজের জন্য শুধু" — one-time data for just this Run tap,
+         separate from the persistent "আমার তথ্য" table (userInfoButton
+         in the top bar). Reuses the same dialog/adapter but never
+         writes to Prefs — see MainActivity.showOneTimeUserInfoDialog.
+         A filled dot (elaRunDataDot) lights up once something is
+         attached for this specific reply, so it's clear at a glance
+         which Run this data will actually be sent with. -->
+    <FrameLayout
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="6dp">
+
+        <ImageButton
+            android:id="@+id/elaRunDataButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:padding="4dp"
+            android:background="@drawable/bg_circle_icon"
+            android:src="@drawable/ic_user_info"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/run_data_button_desc" />
+
+        <View
+            android:id="@+id/elaRunDataDot"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_gravity="top|end"
+            android:background="@drawable/bg_circle_icon_active"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <ImageButton
+        android:id="@+id/elaRunButton"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:padding="6dp"
+        android:background="@drawable/bg_circle_icon_active"
+        android:src="@drawable/ic_send"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/workflow_run" />
+</LinearLayout>
