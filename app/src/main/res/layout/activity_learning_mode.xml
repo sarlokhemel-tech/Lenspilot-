@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/learningRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blackboard_bg"
+    android:fitsSystemWindows="false">
+
+    <!-- Thin progress line right at the very top edge. -->
+    <ProgressBar
+        android:id="@+id/lessonProgress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="3dp"
+        android:max="100"
+        android:progress="0"
+        android:progressTint="@color/toggle_on"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- ============ TOP-LEFT CLUSTER: close + step list ============ -->
+    <LinearLayout
+        android:id="@+id/topLeftCluster"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageButton
+            android:id="@+id/closeButton"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_blackboard_circle"
+            android:padding="9dp"
+            android:src="@drawable/ic_close_white"
+            android:contentDescription="বন্ধ করো" />
+
+        <ImageButton
+            android:id="@+id/outlineButton"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/bg_blackboard_circle"
+            android:padding="9dp"
+            android:src="@drawable/ic_steps_list"
+            android:contentDescription="ধাপগুলো দেখাও" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/lessonTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="4dp"
+        android:text="AI লার্নিং মোড"
+        android:textColor="@color/chalk_muted"
+        android:textSize="11sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintTop_toBottomOf="@id/topLeftCluster"
+        app:layout_constraintStart_toStartOf="@id/topLeftCluster"
+        app:layout_constraintEnd_toStartOf="@id/narrationToggleButton" />
+
+    <!-- ============ CENTER-TOP: on/off (narration) toggle ============ -->
+    <ImageButton
+        android:id="@+id/narrationToggleButton"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_toggle_pill"
+        android:padding="12dp"
+        android:src="@drawable/ic_pause_filled"
+        android:contentDescription="থামাও / চালু করো"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- ============ TOP-RIGHT CLUSTER: new message + image ============ -->
+    <LinearLayout
+        android:id="@+id/topRightCluster"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/attachImageButton"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_blackboard_circle"
+            android:padding="9dp"
+            android:src="@drawable/ic_image_upload"
+            android:contentDescription="ছবি দাও" />
+
+        <ImageButton
+            android:id="@+id/newMessageButton"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/bg_blackboard_circle"
+            android:padding="9dp"
+            android:src="@drawable/ic_new_message"
+            android:contentDescription="নতুন মেসেজ" />
+    </LinearLayout>
+
+    <!-- ============ STAGE: diagram / highlight / listening indicator ============ -->
+    <FrameLayout
+        android:id="@+id/stageFrame"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="56dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/captionCard"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/diagramImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            android:contentDescription="ডায়াগ্রাম" />
+
+        <com.hemel.lenspilot.learning.DiagramHighlightView
+            android:id="@+id/highlightView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/speakingIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:indeterminateTint="@color/toggle_on" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="বলছে..."
+                android:textColor="@color/chalk_muted"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- ============ CAPTION: chalk-on-blackboard text, no box ============ -->
+    <FrameLayout
+        android:id="@+id/captionCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="18dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/captionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:textColor="@color/chalk_white"
+            android:textSize="19sp"
+            android:lineSpacingExtra="5dp"
+            android:shadowColor="#80000000"
+            android:shadowDx="0"
+            android:shadowDy="1"
+            android:shadowRadius="3" />
+    </FrameLayout>
+
+    <!-- ============ Floating compose row: appears over the stage when
+         newMessageButton is tapped (top-right). Text + send only, per
+         spec — image goes through attachImageButton instead. ============ -->
+    <LinearLayout
+        android:id="@+id/inputRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginEnd="10dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_blackboard_input"
+        android:padding="6dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/topRightCluster"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <EditText
+            android:id="@+id/topicInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@null"
+            android:hint="কী শিখতে চাও?"
+            android:inputType="textCapSentences|textMultiLine"
+            android:maxLines="4"
+            android:padding="10dp"
+            android:textColor="@color/chalk_white"
+            android:textColorHint="@color/chalk_muted"
+            android:textSize="14sp" />
+
+        <ImageButton
+            android:id="@+id/askButton"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/bg_blackboard_circle"
+            android:padding="9dp"
+            android:src="@drawable/ic_send"
+            android:contentDescription="জিজ্ঞাসা করো" />
+    </LinearLayout>
+
+    <!-- ============ Outline panel: anchored top-left, editable step
+         list, only shown when outlineButton is tapped. Tap a step to
+         rename it. ============ -->
+    <ScrollView
+        android:id="@+id/outlinePanel"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="60dp"
+        android:background="@drawable/bg_blackboard_card"
+        android:padding="14dp"
+        android:visibility="gone"
+        app:layout_constraintWidth_percent="0.62"
+        app:layout_constraintHeight_percent="0.6"
+        app:layout_constraintTop_toBottomOf="@id/topLeftCluster"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:id="@+id/outlineList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
