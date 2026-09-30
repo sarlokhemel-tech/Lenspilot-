@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- মেসেজ ইনপুট গ্লাস কার্ড — কন্ট্রোল প্যানেলের ডান পাশের আইকনে চাপ
+     দিলে এটা খোলে। প্রস্থ শুরুতে ছোট (শুধু EditText-এর minWidth),
+     ইউজার যত লিখবে তত বড় হয় — কারণ এই ভিউটা নিজেই একটা আলাদা
+     WindowManager overlay window (params.width = WRAP_CONTENT), তাই
+     EditText-এর টেক্সট বদলালে স্বাভাবিক requestLayout()-এই window-টা
+     নিজে থেকে রিসাইজ হয়ে যায় — আলাদা করে width ম্যানুয়ালি বসাতে হয় না।
+     maxWidth স্ক্রিনের বেশিরভাগ প্রস্থে ক্যাপ করা, যাতে পুরো স্ক্রিন
+     জুড়ে না যায়। দেখো showMessageInput()/hideMessageInput()
+
+     BUGFIX: আগে এই কার্ড খুললে বন্ধ করার কোনো উপায় ছিল না যদি ইউজার
+     লিখতে না চায় (শুধু আইকনে আবার চাপলে টগল হতো, কিন্তু সেটা স্পষ্ট
+     ছিল না) — এখন overlayMsgCloseButton (×) দিয়ে যেকোনো সময় নিঃসংশয়ে
+     বন্ধ করা যায়, কিছু না লিখেই। -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="10dp"
+    android:paddingEnd="6dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
+    android:background="@drawable/bg_glass_pill"
+    android:elevation="6dp">
+
+    <!-- Picked-image preview chip — gone unless an image is attached. -->
+    <LinearLayout
+        android:id="@+id/overlayMsgImagePreviewRow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="4dp"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:layout_width="44dp"
+            android:layout_height="44dp">
+
+            <ImageView
+                android:id="@+id/overlayMsgImagePreview"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_input_field" />
+
+            <ImageButton
+                android:id="@+id/overlayMsgImageRemoveButton"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="top|end"
+                android:background="@drawable/bg_close_chip"
+                android:padding="3dp"
+                android:src="@drawable/ic_close"
+                android:contentDescription="ছবি সরাও" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            android:id="@+id/overlayMsgAttachButton"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/bg_keyboard_key_special"
+            android:padding="6dp"
+            android:src="@drawable/ic_attach_image"
+            android:contentDescription="ছবি পাঠাও" />
+
+        <EditText
+            android:id="@+id/overlayMsgInput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:minWidth="24dp"
+            android:maxWidth="230dp"
+            android:maxLines="4"
+            android:background="@android:color/transparent"
+            android:hint="লিখো…"
+            android:textColor="@color/text_primary_light"
+            android:textColorHint="@color/text_muted_light"
+            android:textSize="14sp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:inputType="textMultiLine|textCapSentences"
+            android:imeOptions="actionSend" />
+
+        <ImageButton
+            android:id="@+id/overlayMsgSendButton"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/bg_circle_icon_active"
+            android:padding="8dp"
+            android:src="@drawable/ic_send"
+            android:contentDescription="পাঠাও" />
+
+        <ImageButton
+            android:id="@+id/overlayMsgCloseButton"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/bg_close_chip"
+            android:padding="5dp"
+            android:src="@drawable/ic_close"
+            android:contentDescription="বন্ধ করো" />
+
+    </LinearLayout>
+
+</LinearLayout>
