@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+    android:layout_marginEnd="40dp"
+    android:padding="14dp"
+    android:background="@drawable/bg_workflow_card">
+
+    <TextView
+        android:id="@+id/workflowTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_primary_light"
+        android:textStyle="bold"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/workflowStepsText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="@color/text_secondary_light"
+        android:textSize="13sp"
+        android:lineSpacingExtra="2dp" />
+
+    <TextView
+        android:id="@+id/workflowStatusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="@color/primary_action"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <!-- Bottom row: small icon-only Run button, matching ELA 1st's
+         per-reply button (see item_ela_run_button.xml) — same 28dp
+         circle + send icon, no text pill, so every workflow card stays
+         visually light no matter how long the steps list above it is.
+         "এই কাজের জন্য শুধু" data icon sits right next to it (same
+         one-time, never-persisted-to-Prefs mechanism as the ELA button
+         — see MainActivity.showOneTimeUserInfoDialog), so info entered
+         here only ever rides along with THIS card's next Run, not every
+         request — the old always-on header user-info button is gone. -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end|center_vertical"
+        android:layout_marginTop="10dp">
+
+        <FrameLayout
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="6dp">
+
+            <ImageButton
+                android:id="@+id/workflowRunDataButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:padding="4dp"
+                android:background="@drawable/bg_circle_icon"
+                android:src="@drawable/ic_user_info"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/run_data_button_desc" />
+
+            <View
+                android:id="@+id/workflowRunDataDot"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_gravity="top|end"
+                android:background="@drawable/bg_circle_icon_active"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <ImageButton
+            android:id="@+id/workflowRunButton"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:padding="6dp"
+            android:background="@drawable/bg_circle_icon_active"
+            android:src="@drawable/ic_send"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/workflow_run" />
+    </LinearLayout>
+</LinearLayout>
