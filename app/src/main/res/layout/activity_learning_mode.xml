@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/learningRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blackboard_bg"
+    android:fitsSystemWindows="false">
+
+    <!-- Thin progress line right at the very top edge. -->
+    <ProgressBar
+        android:id="@+id/lessonProgress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="3dp"
+        android:max="100"
+        android:progress="0"
+        android:progressTint="@color/toggle_on"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- ============ TOP-LEFT CLUSTER: close + step list ============ -->
+    <LinearLayout
+        android:id="@+id/topLeftCluster"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageButton
+            android:id="@+id/closeButton"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_blackboard_circle"
+            android:padding="9dp"
+            android:src="@drawable/ic_close_white"
+            android:contentDescription="Close" />
+
+        <ImageButton
+            android:id="@+id/outlineButton"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/bg_blackboard_circle"
+            android:padding="9dp"
+            android:src="@drawable/ic_steps_list"
+            android:contentDescription="Lesson steps" />
+
+        <ImageButton
+            android:id="@+id/historyButton"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/bg_blackboard_circle"
+            android:padding="9dp"
+            android:src="@drawable/ic_history_dark"
+            android:contentDescription="Learning history" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/lessonTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="4dp"
+        android:text="AI Learning Mode"
+        android:textColor="@color/chalk_muted"
+        android:textSize="11sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintTop_toBottomOf="@id/topLeftCluster"
+        app:layout_constraintStart_toStartOf="@id/topLeftCluster"
+        app:layout_constraintEnd_toStartOf="@id/narrationToggleButton" />
+
+    <!-- ============ CENTER-TOP: on/off (narration) toggle ============ -->
+    <ImageButton
+        android:id="@+id/narrationToggleButton"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_toggle_pill"
+        android:padding="12dp"
+        android:src="@drawable/ic_pause_filled"
+        android:contentDescription="Pause / resume"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- ============ TOP-RIGHT CLUSTER: new message + image ============ -->
+    <LinearLayout
+        android:id="@+id/topRightCluster"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/attachImageButton"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_blackboard_circle"
+            android:padding="9dp"
+            android:src="@drawable/ic_image_upload"
+            android:contentDescription="Attach image" />
+
+        <ImageButton
+            android:id="@+id/newMessageButton"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/bg_blackboard_circle"
+            android:padding="9dp"
+            android:src="@drawable/ic_new_message"
+            android:contentDescription="New message" />
+    </LinearLayout>
+
+    <!-- ============ CONTENT AREA: board text on one side, picture on the other ============
+         FEATURE ("ছবি স্ক্রিনে ছোট আসে, একপাশে মার্জিত করে দেখাতে হবে" + "বোর্ড
+         মুছবে না"): আগে ডায়াগ্রাম আসলে লেখার বোর্ড লুকিয়ে যেত আর ছবি পুরো ফাঁকা
+         স্টেজে ছোট হয়ে ভাসত। এখন দুটো পাশাপাশি — বাঁয়ে লেখা (captionCard), ডানে
+         সাদা গোল-কোণা প্যানেলে ছবি (stageFrame), ছবি না থাকলে লেখা পুরো জায়গা
+         নেয়। স্ক্রিন সবসময় ল্যান্ডস্কেপ (LearningModeActivity), তাই এটা আড়াআড়ি ভাগ। -->
+    <LinearLayout
+        android:id="@+id/contentArea"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="64dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal"
+        android:weightSum="1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- BOARD TEXT (chalk, no box). Bounded by the row, inner ScrollView scrolls;
+             see LearningModeActivity.boardLog. -->
+        <FrameLayout
+            android:id="@+id/captionCard"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.42"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="10dp"
+            android:visibility="invisible">
+
+        <ScrollView
+            android:id="@+id/captionScroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:fillViewport="false">
+
+            <TextView
+                android:id="@+id/captionText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/chalk_white"
+                android:textSize="19sp"
+                android:lineSpacingExtra="5dp"
+                android:shadowColor="#80000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="3" />
+        </ScrollView>
+        </FrameLayout>
+
+        <!-- RIGHT PANE: the picture panel and the robot companion share the same slot.
+             While no picture is on the stage the robot shows (with the spoken words in a
+             bubble above it); when a picture arrives the robot leaves. -->
+        <FrameLayout
+            android:id="@+id/rightPane"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.58"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="14dp"
+            android:layout_marginBottom="10dp">
+
+            <!-- PICTURE PANEL: real picture + the teacher's-finger highlighter on top -->
+            <FrameLayout
+                android:id="@+id/stageFrame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_diagram_panel"
+                android:padding="8dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/diagramImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="Lesson image" />
+
+                <com.hemel.lenspilot.learning.DiagramHighlightView
+                    android:id="@+id/highlightView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </FrameLayout>
+
+            <!-- SUBTITLE: the words being spoken, shown at the bottom of the picture panel while the
+                 robot is hidden behind a picture — spoken words are never invisible. -->
+            <TextView
+                android:id="@+id/subtitleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_margin="10dp"
+                android:background="@drawable/bg_subtitle"
+                android:elevation="4dp"
+                android:gravity="center"
+                android:lineSpacingExtra="2dp"
+                android:maxLines="3"
+                android:paddingStart="14dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="14dp"
+                android:paddingBottom="8dp"
+                android:textColor="@color/chalk_white"
+                android:textSize="15sp"
+                android:visibility="gone" />
+
+            <!-- ROBOT COMPANION (Lenspilot mascot): speech bubble on top, robot below -->
+            <LinearLayout
+                android:id="@+id/robotStage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:visibility="gone">
+
+                <FrameLayout
+                    android:id="@+id/robotBubbleBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.40"
+                    android:paddingStart="6dp"
+                    android:paddingEnd="6dp">
+
+                    <TextView
+                        android:id="@+id/robotBubbleText"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="bottom"
+                        android:background="@drawable/bg_robot_bubble"
+                        android:gravity="center"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:text=""
+                        android:textColor="#0E1B3D"
+                        android:textStyle="bold"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="11sp"
+                        android:autoSizeMaxTextSize="19sp"
+                        android:autoSizeStepGranularity="1sp"
+                        android:lineSpacingExtra="2dp" />
+                </FrameLayout>
+
+                <ImageView
+                    android:id="@+id/robotBubbleTail"
+                    android:layout_width="26dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_bubble_tail"
+                    android:importantForAccessibility="no" />
+
+                <ImageView
+                    android:id="@+id/robotImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.60"
+                    android:scaleType="fitCenter"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="Lenspilot robot" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- ============ SPEAKING BADGE: small, top-corner only ============
+         FEATURE ("কথা বলার সময় বড় আইকন আসবে না, ব্লাকবোর্ড হুবহু থাকবে"):
+         আগে এটা stageFrame-এর মাঝখানে বড় করে পুরো স্টেজ ঢেকে দিত, আর "speak"
+         সেগমেন্টে caption বোর্ডও লুকিয়ে ফেলত। এখন এটা root layout-এর একদম
+         উপরে ছোট একটা pill — বোর্ড/ডায়াগ্রাম যা-ই স্ক্রিনে থাকুক, তার উপর
+         দিয়ে কিছুই ঢাকে না, "speak" সেগমেন্টে বোর্ড/স্টেজ একদমই বদলায় না
+         (LearningModeActivity.kt দেখো)। -->
+    <LinearLayout
+        android:id="@+id/speakingIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_toggle_pill"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="10dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/narrationToggleButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ProgressBar
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:indeterminateTint="@color/toggle_on" />
+
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="Thinking…"
+            android:textColor="@color/chalk_muted"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+
+    <!-- ============ Floating compose row: appears over the stage when
+         newMessageButton is tapped (top-right). Text + send only, per
+         spec — image goes through attachImageButton instead. ============ -->
+    <LinearLayout
+        android:id="@+id/inputRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginEnd="10dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_blackboard_input"
+        android:padding="6dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/topRightCluster"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <EditText
+            android:id="@+id/topicInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@null"
+            android:hint="What would you like to learn?"
+            android:inputType="textCapSentences|textMultiLine"
+            android:maxLines="4"
+            android:padding="10dp"
+            android:textColor="@color/chalk_white"
+            android:textColorHint="@color/chalk_muted"
+            android:textSize="14sp" />
+
+        <ImageButton
+            android:id="@+id/askButton"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/bg_blackboard_circle"
+            android:padding="9dp"
+            android:src="@drawable/ic_send"
+            android:contentDescription="Send" />
+    </LinearLayout>
+
+    <!-- ============ Outline panel: anchored top-left, editable step
+         list, only shown when outlineButton is tapped. Tap a step to
+         rename it. ============ -->
+    <ScrollView
+        android:id="@+id/outlinePanel"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="60dp"
+        android:background="@drawable/bg_blackboard_card"
+        android:padding="14dp"
+        android:visibility="gone"
+        app:layout_constraintWidth_percent="0.62"
+        app:layout_constraintHeight_percent="0.6"
+        app:layout_constraintTop_toBottomOf="@id/topLeftCluster"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:id="@+id/outlineList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
