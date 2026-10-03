@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tools মোড — Learning Mode-এর পাশের বাটন থেকে খোলে (MainActivity.
+     openToolsMode)। এখনো ডেমো/UI-only: ভিডিও তোলা যায়, নির্দেশনা লেখা যায়,
+     কিন্তু আসল এডিট (FFmpeg) এখনো যুক্ত হয়নি — দেখো ToolsModeActivity-এর
+     ক্লাস-কমেন্ট। -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blackboard_bg">
+
+    <ImageButton
+        android:id="@+id/closeButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginStart="14dp"
+        android:background="@drawable/bg_blackboard_circle"
+        android:padding="9dp"
+        android:src="@drawable/ic_close"
+        android:contentDescription="বন্ধ করুন"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/toolsTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Tools মোড — ভিডিও এডিট"
+        android:textColor="@color/chalk_white"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/closeButton"
+        app:layout_constraintEnd_toStartOf="@id/closeButtonSpacer" />
+
+    <View
+        android:id="@+id/closeButtonSpacer"
+        android:layout_width="40dp"
+        android:layout_height="1dp"
+        app:layout_constraintTop_toTopOf="@id/closeButton"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- ডেমো ব্যাজ — যতদিন FFmpeg যুক্ত না হচ্ছে ততদিন স্পষ্ট করে জানানো
+         থাকে যে এটা এখনো প্রিভিউ, যাতে কেউ ভেবে না বসে এডিট আসলেই হচ্ছে। -->
+    <TextView
+        android:id="@+id/demoBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_toggle_pill"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:text="ডেমো — এডিট ইঞ্জিন শীঘ্রই আসছে"
+        android:textColor="@color/chalk_muted"
+        android:textSize="11sp"
+        app:layout_constraintTop_toBottomOf="@id/toolsTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- ভিডিও আপলোড কার্ড -->
+    <FrameLayout
+        android:id="@+id/videoPickCard"
+        android:layout_width="0dp"
+        android:layout_height="180dp"
+        android:layout_marginTop="22dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/bg_blackboard_circle"
+        app:layout_constraintTop_toBottomOf="@id/demoBadge"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <VideoView
+            android:id="@+id/videoPreview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/videoPickPrompt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:src="@drawable/ic_tools_mode"
+                app:tint="@color/chalk_muted"
+                android:contentDescription="" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="ভিডিও বেছে নিতে চাপ দিন"
+                android:textColor="@color/chalk_muted"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/videoFileNameLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="#99000000"
+            android:padding="8dp"
+            android:textColor="@color/chalk_white"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:ellipsize="middle"
+            android:singleLine="true" />
+    </FrameLayout>
+
+    <!-- নির্দেশনা বক্স — কোনো ধরাবাঁধা সিস্টেম প্রম্পট নেই, যা লেখা হবে
+         পরে (FFmpeg যুক্ত হলে) হুবহু সেই নির্দেশনা AI-কে দেওয়া হবে। -->
+    <EditText
+        android:id="@+id/instructionInput"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/bg_blackboard_circle"
+        android:padding="14dp"
+        android:gravity="top|start"
+        android:hint="কীভাবে এডিট করতে চান লিখুন — যেমন: 'প্রথম ১০ সেকেন্ড কেটে বাদ দাও আর ভিডিওটা দ্বিগুণ গতিতে করে দাও'"
+        android:textColorHint="@color/chalk_muted"
+        android:textColor="@color/chalk_white"
+        android:textSize="14sp"
+        android:inputType="textMultiLine|textCapSentences"
+        app:layout_constraintTop_toBottomOf="@id/videoPickCard"
+        app:layout_constraintBottom_toTopOf="@id/runButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/runButton"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/bg_circle_icon_active"
+        android:text="এডিট করো (ডেমো)"
+        android:textColor="@color/chalk_white"
+        android:textAllCaps="false"
+        android:enabled="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
