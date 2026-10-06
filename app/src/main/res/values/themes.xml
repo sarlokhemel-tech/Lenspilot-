@@ -1,0 +1,39 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.Lenspilot" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary_action</item>
+        <item name="colorPrimaryDark">@color/background_light</item>
+        <item name="colorAccent">@color/navigation</item>
+        <item name="android:windowBackground">@color/background_light</item>
+        <item name="android:statusBarColor" tools:targetApi="21">@color/background_light</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
+    </style>
+
+    <!-- AI লার্নিং মোড: পুরো স্ক্রিন ডার্ক — আগে এই Activity-ও সাদা Theme.Lenspilot-এ চলত, তাই শুরুতে/
+         ঘোরানোর সময় সাদা ঝলক আসত আর স্ট্যাটাস/নেভিগেশন বার সাদা থাকত। -->
+    <style name="Theme.Lenspilot.Learning" parent="Theme.Lenspilot">
+        <item name="android:windowBackground">@color/blackboard_bg</item>
+        <item name="android:statusBarColor" tools:targetApi="21">@color/blackboard_bg</item>
+        <item name="android:navigationBarColor" tools:targetApi="21">@color/blackboard_bg</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
+    </style>
+
+    <style name="Theme.Lenspilot.Splash" parent="Theme.Lenspilot">
+        <item name="android:windowBackground">@color/background_light</item>
+    </style>
+
+    <!-- Used only by QuickScanTrampolineActivity — a real Activity is the
+         one thing that reliably collapses the Quick Settings shade on
+         every Android version (startActivityAndCollapse), but it must be
+         fully invisible since its only job is to close the panel and
+         trigger the scan a moment later. -->
+    <style name="Theme.Lenspilot.Invisible" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowDisablePreview">true</item>
+    </style>
+
+</resources>

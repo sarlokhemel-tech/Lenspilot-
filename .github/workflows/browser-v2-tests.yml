@@ -1,0 +1,32 @@
+name: Browser Agent v2 tests
+
+# সার্ভার (mock LLM) + lp_observe.js/lp_act.js (আসল Chromium) — APK build-এর থেকে আলাদা, তাই build ভাঙে না।
+on:
+  workflow_dispatch: {}
+  push:
+    paths:
+      - "app.py"
+      - "app/src/main/assets/lp_*.js"
+      - "tests/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: |
+          pip install flask requests numpy matplotlib playwright
+          python -m playwright install --with-deps chromium
+      - name: Server tests (mock LLM)
+        run: python tests/browser_v2_server_test.py
+      - name: Multi-agent Agent A tests
+        run: python tests/multi_agent_agent_a_test.py
+      - name: Scenario runner (§9)
+        run: python tests/browser_scenario_runner.py
+      - name: JS tests (real Chromium)
+        run: python tests/lp_js_chromium_test.py
