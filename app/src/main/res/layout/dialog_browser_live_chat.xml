@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- অটোমেশন ব্রাউজারের লাইভ চ্যাট: ফুল-স্ক্রিন গ্লাস কার্ড। সব লেখা সাদা; পেছনের ব্রাউজার ঝাপসা
+     কাচের ভেতর দিয়ে দেখা যায় (ডায়ালগ-উইন্ডোর dim/blur)। উপরে ডানে × = চ্যাট থেকে বেরোনো। -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="6dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="লাইভ চ্যাট"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:shadowColor="#99000000"
+                android:shadowDx="0" android:shadowDy="1" android:shadowRadius="4" />
+
+            <TextView
+                android:id="@+id/liveChatSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="ব্রাউজার AI-র সাথে কথা বলুন"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:alpha="0.85"
+                android:shadowColor="#99000000"
+                android:shadowDx="0" android:shadowDy="1" android:shadowRadius="3" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/liveChatSpeakerButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_live_glass_circle"
+            android:padding="9dp"
+            android:src="@drawable/ic_speaker_white"
+            android:contentDescription="AI-র উত্তর জোরে পড়ে শোনাও" />
+
+        <ImageButton
+            android:id="@+id/liveChatCloseButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_live_glass_circle"
+            android:padding="10dp"
+            android:src="@drawable/ic_close_white"
+            android:contentDescription="চ্যাট বন্ধ করো" />
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/liveChatScroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:fillViewport="false"
+        android:scrollbars="none"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:id="@+id/liveChatList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="4dp"
+            android:paddingBottom="8dp" />
+    </ScrollView>
+
+    <!-- এজেন্ট এই মুহূর্তে কী করছে (ব্রাউজারের স্ট্যাটাস লাইভ) -->
+    <TextView
+        android:id="@+id/liveChatStatusChip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:background="@drawable/bg_live_glass_card"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/liveChatImagePreviewRow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:layout_width="56dp"
+            android:layout_height="56dp">
+
+            <ImageView
+                android:id="@+id/liveChatImagePreview"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_live_glass_card" />
+
+            <ImageButton
+                android:id="@+id/liveChatImageRemove"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="top|end"
+                android:background="@drawable/bg_live_glass_circle_active"
+                android:padding="4dp"
+                android:src="@drawable/ic_close_white"
+                android:contentDescription="ছবি সরাও" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_live_glass_input"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp">
+
+        <ImageButton
+            android:id="@+id/liveChatAttachButton"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_live_glass_circle"
+            android:padding="9dp"
+            android:src="@drawable/ic_attach_white"
+            android:contentDescription="ছবি পাঠাও" />
+
+        <EditText
+            android:id="@+id/liveChatInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:background="@null"
+            android:hint="কাজ বলুন বা প্রশ্ন করুন…"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#B3FFFFFF"
+            android:textSize="15sp"
+            android:maxLines="4"
+            android:minHeight="40dp"
+            android:inputType="textMultiLine|textCapSentences" />
+
+        <ImageButton
+            android:id="@+id/liveChatMicButton"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/bg_live_glass_circle"
+            android:padding="9dp"
+            android:src="@drawable/ic_mic_white"
+            android:contentDescription="কথা বলে বলুন" />
+
+        <ImageButton
+            android:id="@+id/liveChatSendButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_live_glass_circle_active"
+            android:padding="9dp"
+            android:src="@drawable/ic_send_white"
+            android:contentDescription="পাঠাও" />
+    </LinearLayout>
+</LinearLayout>
