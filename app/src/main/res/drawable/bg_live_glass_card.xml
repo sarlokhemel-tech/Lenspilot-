@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AI-র বার্তা: গাঢ় কাচ — হালকা ব্যাকগ্রাউন্ডেও সাদা লেখা পড়া যায় -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#B3101820" />
+    <stroke android:width="1dp" android:color="#59FFFFFF" />
+    <corners android:radius="18dp" />
+</shape>
