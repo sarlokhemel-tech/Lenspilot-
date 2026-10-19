@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Plain chat-bubble icon for overlayMessageButton (see
+     overlay_control_bar.xml) — replaces ic_bubble_trigger.png, which was
+     actually a camera-lens graphic despite the button being "লিখে উত্তর
+     দাও" (write a reply/instruction), not a camera action. Same plain
+     filled-shape style as ic_speaker.xml/ic_stop.xml in this same bar. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="@color/text_primary_light"
+        android:pathData="M20,2 L4,2 C2.9,2 2,2.9 2,4 L2,22 L6,18 L20,18 C21.1,18 22,17.1 22,16 L22,4 C22,2.9 21.1,2 20,2 Z" />
+</vector>

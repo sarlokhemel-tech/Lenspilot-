@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- মাল্টি-এজেন্ট মোডের প্রতিটা উত্তরের নিচের "Resources" বাটন — ELA 4N-এর Run বাটনের
+     (item_ela_run_button.xml) জায়গায় বসে, কিন্তু Run-এর বদলে এটা চাপলে
+     MultiAgentResourcesActivity খোলে: দুই AI কোন কোন ওয়েবে সার্চ করেছে আর
+     তাদের নিজের নিজের উত্তর কেমন ছিল। -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="end|center_vertical"
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="4dp"
+    android:layout_marginEnd="40dp">
+
+    <LinearLayout
+        android:id="@+id/maResourcesButton"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="10dp"
+        android:paddingEnd="12dp"
+        android:background="@drawable/bg_source_chip"
+        android:clickable="true"
+        android:focusable="true"
+        android:contentDescription="@string/cd_ma_resources">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginEnd="6dp"
+            android:src="@drawable/ic_web_sources"
+            android:importantForAccessibility="no" />
+
+        <TextView
+            android:id="@+id/maResourcesLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ma_resources_button"
+            android:textColor="@color/text_primary_light"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</LinearLayout>

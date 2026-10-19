@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v31: ক্লাস ভিডিও/PDF নোট শেয়ার ও খোলার জন্য (Android 8–9-এ; Android 10+ MediaStore ব্যবহার করে) -->
+<paths>
+    <external-files-path name="class_exports" path="Download/" />
+    <cache-path name="cache_exports" path="." />
+</paths>
