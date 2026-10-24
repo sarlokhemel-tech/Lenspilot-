@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v40: গাইডলাইন-মোডের টেম্পোরারি গ্লাস চ্যাট (কন্ট্রোল-বারের মেসেজ আইকনে খোলে)। অটোমেশন ব্রাউজারের লাইভ চ্যাটের
+     হুবহু একই কাঠামো: উপরে ×, মাঝে বার্তার কার্ড, নিচে 🖼 ছবি + লেখার ঘর + পাঠাও। পেছন একদম স্বচ্ছ;
+     উইন্ডো শুধু কন্টেন্টের সমান উঁচু, তাই বাকি স্ক্রিন ছোঁয়া যায়। দেখো GuideChatOverlay। -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/guideChatRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+<!-- v45: বাইরের FrameLayout + ভেতরের নিচে-বসা প্যানেল। লেখার সময় উইন্ডো পুরো স্ক্রিন (ADJUST_RESIZE, কিবোর্ডের ওপরে
+     ইনপুট), পাঠানোর পর আবার ছোট/ফোকাসহীন — যাতে নিচের অ্যাপ ছোঁয়া যায়। দেখো GuideChatOverlay.applyWindow -->
+<LinearLayout
+    android:id="@+id/guideChatPanel"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:clickable="true"
+    android:orientation="vertical"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_live_glass_input"
+        android:paddingStart="16dp"
+        android:paddingEnd="6dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Guide chat"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="Give the AI new information or instructions"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:alpha="0.8" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/guideChatClose"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_live_glass_circle"
+            android:padding="10dp"
+            android:src="@drawable/ic_close_white"
+            android:contentDescription="Close chat" />
+    </LinearLayout>
+
+    <com.hemel.lenspilot.chat.MaxHeightScrollView
+        android:id="@+id/guideChatScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:scrollbars="none"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:id="@+id/guideChatList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="8dp" />
+    </com.hemel.lenspilot.chat.MaxHeightScrollView>
+
+    <LinearLayout
+        android:id="@+id/guideChatPreviewRow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:layout_width="56dp"
+            android:layout_height="56dp">
+
+            <ImageView
+                android:id="@+id/guideChatPreview"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_live_glass_card" />
+
+            <ImageButton
+                android:id="@+id/guideChatPreviewRemove"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="top|end"
+                android:background="@drawable/bg_live_glass_circle_active"
+                android:padding="4dp"
+                android:src="@drawable/ic_close_white"
+                android:contentDescription="Remove image" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_live_glass_input"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp">
+
+        <ImageButton
+            android:id="@+id/guideChatAttach"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_live_glass_circle"
+            android:padding="9dp"
+            android:src="@drawable/ic_attach_white"
+            android:contentDescription="Attach image" />
+
+        <EditText
+            android:id="@+id/guideChatInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:background="@null"
+            android:hint="Type…"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#B3FFFFFF"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:maxLines="5"
+            android:minHeight="40dp"
+            android:imeOptions="actionSend"
+            android:inputType="textMultiLine|textCapSentences" />
+
+        <ImageButton
+            android:id="@+id/guideChatSend"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_live_glass_circle_active"
+            android:padding="9dp"
+            android:src="@drawable/ic_send_white"
+            android:contentDescription="Send" />
+    </LinearLayout>
+</LinearLayout>
+</FrameLayout>

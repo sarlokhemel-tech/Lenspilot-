@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v49: নেভি → নীল গ্রেডিয়েন্ট হিরো (হাবের হিরো-কার্ডের মতো) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient android:angle="315" android:startColor="@color/auto_ink" android:endColor="@color/auto_accent" />
+    <corners android:radius="24dp" />
+</shape>
