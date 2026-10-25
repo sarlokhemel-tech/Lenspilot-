@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v56: AI Agent বাবলের পূর্ণ-স্ক্রিন চ্যাটের পেছন — গাঢ় নেভি গ্রেডিয়েন্ট; ওপরে গ্লাস কার্ড/চিপ সুন্দর ভাসে -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:startColor="#0F2A66"
+        android:centerColor="#0B1B4A"
+        android:endColor="#050A1C" />
+</shape>

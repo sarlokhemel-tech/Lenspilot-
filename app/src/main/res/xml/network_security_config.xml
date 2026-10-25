@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v32: অটোমেশন মোডের WebView শুধু অ্যাপের নিজের লোকাল প্রক্সি (http://127.0.0.1) খোলে — শুধু সেটুকুতে cleartext
+     চালু; বাকি সব আগের মতোই (HTTPS-only)। -->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">127.0.0.1</domain>
+        <domain includeSubdomains="false">localhost</domain>
+    </domain-config>
+</network-security-config>
