@@ -1,0 +1,253 @@
+<resources>
+    <string name="app_name">Lenspilot</string>
+    <string name="splash_tagline">Your AI Screen Guide</string>
+    <string name="splash_credit">Created by Hemel</string>
+
+    <string name="signin_prompt">Sign in to get started</string>
+    <string name="signin_subtitle">Lenspilot guides you through any app or screen, step by step.</string>
+    <string name="signin_with_google">Continue with Google</string>
+    <string name="signout">Sign out</string>
+    <string name="signout_confirm_title">Log out?</string>
+    <string name="signout_confirm_message">Are you sure you want to log out? You will need to sign in again to keep using the app.</string>
+    <string name="signout_confirm_yes">Yes, log out</string>
+    <string name="signout_confirm_no">Cancel</string>
+    <string name="signin_welcome">Welcome, %1$s</string>
+    <string name="signin_failed">Sign-in failed: %1$s</string>
+
+    <!-- Firebase console -> Project settings -> General tab -> "Project number" -->
+    <string name="cloud_project_number" translatable="false">880093407478</string>
+    <!-- Your Hugging Face Space URL, no trailing slash -->
+    <string name="space_base_url" translatable="false">https://hemel24-downloadmessengerapk.hf.space</string>
+    <string name="keyboard_label">Lenspilot Keyboard</string>
+    <string name="keyboard_space_key">Space</string>
+    <string name="keyboard_enter_key">Enter</string>
+
+    <string name="test_backend">Test Backend Connection</string>
+    <string name="testing_in_progress">Connecting…</string>
+    <string name="main_placeholder_note">Chat, live voice, and on-screen guidance arrive in the next build phase.</string>
+
+    <!-- Ad-reward token economy -->
+    <!-- AdMob rewarded ad unit — the token top-up ad. The AdMob App ID
+         itself lives in AndroidManifest.xml (APPLICATION_ID meta-data). -->
+    <string name="reward_ad_unit_id" translatable="false">ca-app-pub-7007962993307475/8751457637</string>
+    <!-- Start.io app id — see AndroidManifest.xml's com.startapp.sdk.APPLICATION_ID
+         meta-data (must match) and ads/AdNetworkManager.kt. Start.io's SDK
+         doesn't use a separate per-ad-unit id for a basic Rewarded Video
+         placement the way AdMob does — the App ID + the ad mode you pass to
+         StartAppAd (AdMode.REWARDED_VIDEO) is enough. -->
+    <string name="startio_app_id" translatable="false">208622167</string>
+    <string name="tokens_input_label">Input</string>
+    <string name="tokens_output_label">Output</string>
+    <string name="get_tokens_button">Get tokens</string>
+    <string name="token_limit_title">Tokens used up</string>
+    <string name="token_limit_body">Watch an ad to earn free tokens and continue.</string>
+    <string name="token_limit_watch_ad">Watch an ad</string>
+    <string name="token_menu_watch_ad">🎬 Watch an ad for tokens</string>
+    <string name="token_menu_freemium">🔑 Unlimited with your own Gemini key</string>
+    <string name="token_limit_cancel">Cancel</string>
+    <string name="ad_break_title">🎉 You earned tokens!</string>
+    <string name="ad_break_watch_more">➕ Watch more, earn more tokens</string>
+    <string name="ad_break_stop">Not now</string>
+    <string name="ad_break_suggestion">We suggest watching at least 4 ads (optional). You can watch as many as you like.</string>
+    <string name="ad_break_watched_count">Watched this session: %1$d</string>
+    <string name="ad_loading">Loading ad…</string>
+    <string name="ad_failed">The ad cannot be shown right now. Please try again shortly.</string>
+
+    <string name="accessibility_service_description">Lets Lenspilot read what\'s on your screen (button labels, text, layout) so it can highlight where to tap and guide you step by step. Lenspilot only reads the screen — it does not tap, type, or take any action on its own unless you explicitly enable automation.</string>
+    <string name="accessibility_choice_title">Accessibility: optional, but faster</string>
+    <string name="accessibility_choice_body">Lenspilot works both ways:\n\n✅ With Accessibility on, the screen is read directly and quickly (accessibility tree), so guidance appears almost instantly.\n\n➖ With Accessibility off, the app still works, but it must understand the screen through on-device icon detection and text recognition, so it can be a little slower. In that case it needs a one-time screen-capture permission to take screenshots, and the \"Display over other apps\" permission to draw highlights. These are two separate permissions and do not replace Accessibility.\n\nThe whole app can be used without Accessibility; only the speed differs. If you prefer, ignore this for now and continue. You can turn it on or off at any time in Settings.</string>
+    <string name="accessibility_choice_enable">Turn on Accessibility</string>
+    <string name="accessibility_choice_skip">Not now (ignore)</string>
+    <string name="fallback_mode_notice">Running in vision mode</string>
+
+    <!-- Chat screen -->
+    <string name="chat_empty_state">Get an AI agent</string>
+    <string name="chat_input_hint">Type…</string>
+    <string name="chat_send">Send</string>
+    <string name="chat_history_title">History</string>
+    <string name="chat_history_empty">No past conversations yet.</string>
+    <string name="chat_new_chat">New chat</string>
+
+    <string name="workflow_run">Run</string>
+    <string name="workflow_step_count">%1$d steps</string>
+    <string name="workflow_running">Running…</string>
+    <string name="workflow_open_home">Going to the home screen…</string>
+    <string name="workflow_need_accessibility">Turn on Accessibility first, then tap Run again</string>
+    <string name="accessibility_stuck_title">Accessibility is ON in Settings but still not working</string>
+    <string name="accessibility_stuck_body">This is usually caused by one of the following:\n\n1) The phone\'s battery saver has stopped Lenspilot in the background. The service may show ON in Settings while it is not actually running. Tap \"Open battery settings\" below and set Lenspilot to \"No restrictions\" / \"Unrestricted\".\n\n2) Many phones (especially some Chinese brands) have a separate \"Auto-launch\" / \"Startup manager\" / \"Protected apps\" manager outside the normal battery settings. Look for those names (or \"App launch\") in your phone\'s Settings. If it exists, turn off \"Manage automatically\" for Lenspilot and turn ON every toggle (Auto-launch, Run in background and so on). The menu name and location differ by manufacturer, so find the exact steps in your phone\'s own Settings app.\n\n3) Because this app was installed outside the Play Store, newer Android versions (13+) may block it as a \"restricted setting\". To fix it: open App Info, tap the ⋮ (three-dot) menu at the top right, tap \"Allow restricted settings\", then turn Accessibility ON again.\n\nAfter fixing it, turn Accessibility OFF and ON once more to be certain it works.</string>
+    <string name="accessibility_stuck_open_app_info">Open App Info</string>
+    <string name="accessibility_stuck_open_battery">Open battery settings</string>
+    <string name="workflow_done">Task complete ✅</string>
+
+    <string name="mic_permission_needed">Microphone permission is required for voice commands</string>
+    <string name="mic_listening">Listening…</string>
+    <string name="mic_transcribing">Transcribing…</string>
+
+    <!-- Settings (kept in English by request, regardless of app language) -->
+    <string name="settings">Settings</string>
+    <string name="user_info_title">My information</string>
+    <string name="user_info_one_time_title">For this task only</string>
+    <string name="run_data_button_desc">Provide information for this task only</string>
+    <string name="user_info_cd_button">My information</string>
+    <string name="user_info_add_row">+ Add row</string>
+    <string name="user_info_add_from_image">Get information from an image</string>
+    <string name="user_info_label_hint">Title</string>
+    <string name="user_info_value_hint">Information</string>
+    <string name="user_info_delete_row">Delete row</string>
+    <string name="user_info_header_label">Title</string>
+    <string name="user_info_header_value">Information</string>
+    <string name="user_info_extracting">Extracting information from the image…</string>
+    <string name="user_info_extract_failed">Could not extract information from the image. Please try again.</string>
+    <string name="user_info_extract_empty">No usable information was found in the image.</string>
+    <string name="user_info_saved">Information saved.</string>
+    <string name="setting_auto_speak_title">Always speak guidance aloud</string>
+    <string name="setting_auto_speak_desc">When on, guidance is read aloud as soon as it\'s ready — no need to tap the speaker button</string>
+    <string name="setting_screen_guide_mode_vision">AI Vision (default: guides by viewing screenshots; no accessibility tree needed; works with both Gemini and Groq)</string>
+    <string name="setting_vision_quality_title">📷 Screenshot quality (screen guide, all four models)</string>
+    <string name="setting_vision_quality_desc">The quality of the screenshot the AI uses to choose buttons. Color images do not add tokens but help a great deal in recognizing icons, toggles and enabled/disabled buttons. A higher resolution makes small text and icons clearer (slightly more tokens); a lower one is faster and lighter.</string>
+    <string name="setting_vision_color">Color screenshots (grayscale when off)</string>
+    <string name="setting_vision_res_tiny">Resolution: very low (~1000px, fastest and lightest)</string>
+    <string name="setting_vision_res_low">Resolution: low (~1400px)</string>
+    <string name="setting_vision_res_mid">Resolution: medium (~1800px, default)</string>
+    <string name="setting_vision_res_full">Resolution: full (actual screen, most accurate, more tokens)</string>
+    <string name="setting_vision_auto_boost">Automatic boost: when the AI says it cannot find something or is unsure, or on an irreversible step (send / delete / payment), that single call sends the full resolution in color</string>
+    <string name="setting_screen_guide_mode_title">Screen reading method</string>
+    <string name="setting_screen_guide_mode_desc">Even with Accessibility on, you can always use the Screen VLM. Without the Accessibility permission, the on-device icon detector model is used (offline, fast).</string>
+    <string name="setting_screen_guide_mode_accessibility">Accessibility Tree (default; falls back to the on-device icon detector without the permission)</string>
+    <string name="setting_screen_guide_mode_vlm">Screen VLM (always, runs on the server, slower but recognizes more icons)</string>
+    <string name="setting_screen_guide_mode_yolo">YOLO icon detector (always, runs on the device: offline, fast, fixed icon list)</string>
+    <string name="setting_screen_guide_mode_ocr">OCR only (always, reads text only; no icon detection; fastest and cheapest)</string>
+    <string name="setting_screen_guide_mode_hybrid">Hybrid: YOLO + OCR together (always, runs on the device; combining both gives the strongest and most accurate reading, and may take slightly longer)</string>
+    <string name="setting_voice_first_title">Voice command on app launch</string>
+    <string name="setting_voice_first_desc">When on, opening the app shows a large voice ball — speak and the workflow starts right away</string>
+    <string name="setting_support_report_title">Support report</string>
+    <string name="setting_support_report_desc">Report a bad or broken AI response, attach a screenshot, and send it for review</string>
+    <string name="setting_context_window_title">Context window (debug)</string>
+    <string name="setting_context_window_desc">See the on-device scratch log the AI browser used last — for checking it\'s working, not for everyday use</string>
+    <string name="context_window_empty">Nothing recorded yet. It will appear here after you use the AI browser once.</string>
+
+    <!-- Report flow (Settings-adjacent, kept in English) -->
+    <string name="report_dialog_title">Report an issue</string>
+    <string name="report_reported_message_label">Reported message</string>
+    <string name="report_description_hint">Describe what went wrong…</string>
+    <string name="report_attach_screenshot">Attach screenshot</string>
+    <string name="report_screenshot_attached">Screenshot attached</string>
+    <string name="report_remove_screenshot">Remove</string>
+    <string name="report_submit">Submit report</string>
+    <string name="report_cancel">Cancel</string>
+    <string name="report_description_required">Please describe the issue</string>
+    <string name="report_sending">Sending report…</string>
+    <string name="report_sent">Report sent. Thank you.</string>
+    <string name="report_failed">Couldn\'t send report: %1$s</string>
+    <string name="cd_report_message">Report this response</string>
+    <string name="cd_view_sources">View the web sources used for this reply</string>
+    <string name="sources_dialog_title">Sources</string>
+
+    <!-- Instant placeholder shown the moment a message is sent — matches
+         the server\'s first SSE status text exactly, so there\'s no
+         separate "…" loading step the user has to see first. -->
+    <string name="ai_responding_placeholder">✍️ Responding…</string>
+    <string name="cd_copy_message">Copy</string>
+    <string name="copied_toast">Copied</string>
+    <string name="cd_retry_message">Regenerate response</string>
+    <string name="cd_retry_user_message">Resend message</string>
+    <string name="cd_master_off">Stop everything</string>
+    <string name="master_off_confirm_toast">Everything stopped</string>
+    <string name="cd_discussion_mode">Discussion mode — screen guide, no workflow</string>
+
+    <!-- History (list of past conversations) -->
+    <string name="history_empty_title">No conversations yet</string>
+    <string name="history_empty_subtitle">Your past chats will show up here</string>
+    <string name="history_item_workflow_prefix">Workflow</string>
+    <string name="history_item_chat_prefix">Chat</string>
+
+    <!-- Voice-first launch overlay -->
+    <string name="voice_first_tap_hint">Tell me what you want to do</string>
+    <string name="voice_first_listening">Listening…</string>
+    <string name="voice_first_sending">Sending…</string>
+    <string name="cd_voice_first_ball">Give a voice command</string>
+    <string name="cd_close_voice_first">Go to the chat box</string>
+    <string name="cd_voice_first_browser_toggle">AI browser mode</string>
+
+    <!-- Lenspilot Keyboard mode — a normal system keyboard (IME), no
+         Accessibility permission involved anywhere in this feature. -->
+    <string name="cd_keyboard_mode_button">Lenspilot Keyboard mode</string>
+    <string name="keyboard_subtype_english">English</string>
+    <string name="keyboard_subtype_bangla">Bangla</string>
+
+    <string name="keyboard_mode_title">⌨️ Lenspilot Keyboard</string>
+    <string name="keyboard_mode_body_disabled">This is a regular keyboard, and you type on it just like Google Keyboard. It has one extra ✨ button that, when tapped, uses AI to generate any text and enter it directly into the field (auto-typing).\n\nIt does not need the Accessibility permission. It only has to be activated as a keyboard, the same way as any new keyboard app.\n\nIn the next step, go to the system settings and turn on \"Lenspilot Keyboard\", then come back and tap \"Switch now\".</string>
+    <string name="keyboard_mode_body_enabled_not_active">Lenspilot Keyboard is turned on but is not currently set as the active keyboard. Tap the button below to choose it as the current keyboard.</string>
+    <string name="keyboard_mode_body_active">Lenspilot Keyboard is now on and active ✅\n\nTap any search bar or text field in any app and this keyboard opens. Tap the ✨ button on the keyboard and say or type what you want entered; the AI does the rest.</string>
+    <string name="keyboard_mode_open_settings">Go to system settings</string>
+    <string name="keyboard_mode_switch_now">Switch now</string>
+    <string name="keyboard_mode_close">OK</string>
+    <string name="keyboard_mode_settings_hint">Find \"Lenspilot Keyboard\" in the list and turn it on</string>
+
+    <string name="keyboard_guidance_message">⌨️ Lenspilot Keyboard is now on and active.\n\nTap any search bar or form text field in any app and Lenspilot Keyboard opens. While a task is running, the AI types into the required fields by itself, so you do not need to press anything. You can tap the AI button above to turn this off and type yourself, or tap the stop button in the middle of typing to take control. If the AI cannot tell what to write, it shows a question. Answer it with the microphone button on the control bar instead of the keyboard.</string>
+
+    <!-- Inside the keyboard's own AI top bar — fully automatic, no manual
+         prompt box and no in-keyboard mic (voice answers go through the
+         overlay control bar's own mic instead). -->
+    <string name="keyboard_auto_type_on">AI auto-type: on</string>
+    <string name="keyboard_auto_type_off">AI auto-type: off</string>
+    <string name="keyboard_ai_thinking">The AI is thinking…</string>
+    <string name="keyboard_ai_took_over">The AI was stopped. You are typing now</string>
+    <string name="keyboard_ai_clarify_prefix">The AI asks: %1$s. Tap the microphone button on the control bar to answer</string>
+    <string name="keyboard_ai_need_signin">Open the Lenspilot app and sign in first</string>
+    <string name="keyboard_ai_error_generic">Could not generate this right now. Please try again</string>
+    <string name="cd_keyboard_ai_toggle">Turn AI auto-type on or off</string>
+    <string name="cd_keyboard_globe">Switch keyboard</string>
+    <string name="cd_keyboard_tools">Keyboard settings</string>
+    <string name="keyboard_size_small">Size: small (tap)</string>
+    <string name="keyboard_size_medium">Size: medium (tap)</string>
+    <string name="keyboard_size_large">Size: large (tap)</string>
+    <string name="keyboard_translate_on">Translation feature: on (tap)</string>
+    <string name="keyboard_translate_off">Translation feature: off (tap)</string>
+    <string name="keyboard_translate_lang_prefix">Translation language: %1$s (tap)</string>
+    <string name="keyboard_translate_key">T↔</string>
+    <string name="keyboard_translate_thinking">Translating…</string>
+    <string name="keyboard_translate_empty">There is no typed text</string>
+    <string name="keyboard_translate_error">Could not translate. Please try again</string>
+    <string name="keyboard_translate_disabled_toast">The translation feature is off. Turn it on from ⚙</string>
+    <string name="cd_keyboard_backspace">Backspace</string>
+    <string name="cd_keyboard_shift">Shift</string>
+    <string name="keyboard_ai_stop">Stop</string>
+    <string name="keyboard_ai_use_last_reply">Insert the latest AI reply</string>
+    <string name="keyboard_ai_no_last_reply">There is no AI reply in the Lenspilot app yet</string>
+    <string name="keyboard_ai_password_field_disabled">AI auto-type is off in password fields (for security)</string>
+    <string name="keyboard_ai_blocked_app">AI auto-type is off in this app (banking / financial)</string>
+
+    <!-- মাল্টি-এজেন্ট মোড (দুই AI সার্চ করে → চূড়ান্ত বিচারক মিলিয়ে একটাই সঠিক উত্তর) -->
+    <string name="cd_multi_agent_mode">Multi-agent mode — several AIs search the web, then one verified answer</string>
+    <string name="cd_ma_resources">Resources — which sites each AI searched and what each one answered</string>
+    <string name="ma_resources_button">Resources</string>
+    <string name="ma_resources_title">Resources</string>
+    <string name="ma_close">Back</string>
+    <string name="ma_resources_subtitle">Multi-agent search</string>
+    <string name="ma_hero_title">%1$d AI agents searched the web</string>
+    <string name="ma_question_label">Question</string>
+    <string name="ma_final_by">Final answer written by %1$s</string>
+    <string name="ma_final_by_fallback">Final answer written by %1$s (fallback — the first judge was unavailable)</string>
+    <string name="ma_queries_label">Search queries</string>
+    <string name="ma_sources_label">Websites searched</string>
+    <string name="ma_answer_label">This AI\'s own answer</string>
+    <string name="ma_no_sources">No websites were recorded</string>
+    <string name="ma_status_ok">Answered</string>
+    <string name="ma_status_failed">Failed</string>
+    <string name="ma_mode_google_search">Google Search</string>
+    <string name="ma_mode_browser_search">Web search</string>
+    <string name="ma_mode_wikipedia">Wikipedia (fallback)</string>
+    <string name="ma_mode_none">No live search</string>
+    <string name="ma_agents_label">Agents (how many AIs search)</string>
+    <string name="cd_ma_agent_count">%1$d agents</string>
+    <string name="ma_mode_web_reader">Web pages read</string>
+    <string name="ma_all_sites_label">All websites visited (%1$d)</string>
+    <string name="ma_opened_badge">Opened &amp; read</string>
+    <string name="ma_note_label">Note</string>
+    <string name="ma_no_data">No resource data for this reply</string>
+    <string name="ma_mode_on_toast">Multi-agent mode ON — pick how many AI agents search the web (2–5); one verified answer is written</string>
+    <string name="ma_mode_off_toast">Multi-agent mode OFF</string>
+    <string name="ma_input_hint">Ask anything — several AIs will verify it</string>
+</resources>
+
