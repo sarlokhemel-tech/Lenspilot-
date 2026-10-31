@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- লার্নিং মোডে পাঠানোর বাটন — ব্ল্যাকবোর্ডের সবুজ অ্যাকসেন্ট (toggle_on) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/toggle_on" />
+</shape>

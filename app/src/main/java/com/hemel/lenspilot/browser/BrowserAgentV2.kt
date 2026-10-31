@@ -1,0 +1,1079 @@
+package com.hemel.lenspilot.browser
+
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.net.Uri
+import android.os.SystemClock
+import android.util.Base64
+import android.view.KeyEvent
+import android.view.MotionEvent
+import android.webkit.ValueCallback
+import android.webkit.WebView
+import com.hemel.lenspilot.R
+import com.hemel.lenspilot.net.ApiClient
+import com.hemel.lenspilot.security.SecretCapture
+import com.hemel.lenspilot.security.SecretVault
+import com.hemel.lenspilot.security.VaultRefs
+import com.hemel.lenspilot.tools.perm.Decision
+import com.hemel.lenspilot.tools.perm.PermissionGate
+import com.hemel.lenspilot.tools.perm.Risk
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.ByteArrayOutputStream
+import java.net.URLEncoder
+import java.util.UUID
+import kotlin.coroutines.resume
+
+/** AiBrowserActivity যা যা দেয় — এজেন্ট শুধু এই ইন্টারফেস দিয়ে UI/WebView ছোঁয়। */
+interface AgentHost {
+    val context: Context
+    val webView: WebView
+    fun setStatus(text: String)
+    fun isAiOn(): Boolean
+    /** কাজ সত্যিই শেষ। */
+    fun onTaskFinished(message: String)
+    /** মানুষের হাতে হস্তান্তর (ক্যাপচা/লগইন/OTP/পেমেন্ট): লুপ থেমে আছে, কিন্তু session টিকে আছে। */
+    fun onHandoff(kind: String, message: String)
+    /** ইউজারকে নির্দিষ্ট প্রশ্ন (ইনপুট দরকার / সিঁড়ির শেষ ধাপ)। উত্তর এলে [BrowserAgentV2.provideUserText]। */
+    fun onAskUser(message: String)
+    /** অপরিবর্তনীয় ধাপের এক-ট্যাপ নিশ্চিতকরণ। result: ONCE | ALL | STOP */
+    fun confirmIrreversible(message: String, onResult: (String) -> Unit)
+    /** ফাইল-চুজার: ইউজার ফাইল বাছবে। */
+    fun pickFile(ref: String, callback: ValueCallback<Array<Uri>>)
+    /** v2 চালানো গেল না (সার্ভারে বন্ধ / পুরনো সার্ভার) — পুরনো লুপে ফিরে যাও। */
+    fun fallbackToLegacy()
+    fun onRunStateChanged(running: Boolean)
+    /** একাধিক বিকল্প: ইউজার বাছবে। onResult(null) = "আমি নিজেই করছি"। */
+    fun askChoice(message: String, options: List<String>, onResult: (String?) -> Unit)
+    /** ভল্টে নেই এমন গোপন তথ্য — আলাদা সুরক্ষিত বক্স (AI পড়তে পারে না)। onResult(true) = ভল্টে সংরক্ষিত। */
+    fun askSecret(title: String, label: String, kind: String, onResult: (Boolean) -> Unit)
+    /** OTP: নির্দিষ্ট অ্যাপ intent-এ খুলে গাইডলাইন চালু। false = অ্যাপ খোলা যায়নি। */
+    fun startOtpAssist(source: String, appName: String): Boolean
+    fun stopOtpAssist()
+}
+
+/**
+ * Browser Agent v2 (স্পেক B1–B13): একবার ভালো পর্যবেক্ষণ → প্ল্যান ও লেজার → এক কলে সিদ্ধান্ত →
+ * অ্যাকশনের পর আসল ফল মাপা → ব্যর্থ হলে সিঁড়ি বেয়ে নিজে শোধরানো → শুধু সত্যিকারের মানুষের কাজে থামা।
+ *
+ * লুপটা একটা coroutine (main thread)। সিদ্ধান্ত নেয় সার্ভারের AI; এখানে কোনো শব্দ-তালিকা/regex নেই —
+ * শুধু কাঠামোগত সংকেত (URL/DOM-hash বদল, আউটকাম) আর খরচ/লুপ-ব্রেক।
+ */
+class BrowserAgentV2(private val host: AgentHost, private val scope: CoroutineScope) {
+
+    companion object {
+        private const val STEP_LIMIT_CHECKIN = 60          // পজ নয়, শুধু "চেক-ইন" (স্পেক B8)
+        private const val STEP_LIMIT_CHECKIN_4N = 200
+        private const val SETTLE_QUIET_MS = 120L           // MutationObserver এ এতক্ষণ শান্ত থাকলে এগোই
+        private const val SETTLE_MAX_MS = 1600L
+        private const val NAV_WATCHDOG_MS = 2500L          // শেষ ভরসা — মূল অপেক্ষা অবস্থা-ভিত্তিক
+        private const val OBSERVE_BUDGET_TOKENS = 1800
+        private const val MAX_REPLANS = 2
+        private const val HANDOFF_POLL_MS = 2500L
+        private const val ELEMENT_RETRY = 3
+        private const val OBSERVE_FAIL_LIMIT = 6
+    }
+
+    // ---- রান-অবস্থা (লেজারসহ ডিস্কে সংরক্ষিত) ----
+    var active = false; private set
+    private var job: Job? = null
+    private var runId = UUID.randomUUID().toString().replace("-", "").take(24)
+    private var goal = ""
+    private var goalExtra = ""
+    private var system = "super_1_2"
+    private var plan = JSONObject()
+    private var ledger = Ledger()
+    private val history = ArrayList<String>()
+    private val userNotes = ArrayList<String>()     // v47: ইউজার এই কাজের সময় যা যা বলেছে — প্রতি ধাপে সার্ভারে যায়, ইতিহাসের সীমায় হারায় না
+    private val searched = ArrayList<String>()      // v46: এই কাজে যা যা সার্চ হয়েছে — সার্ভারকে পাঠানো হয়, এআই পুনরাবৃত্তি করে না
+    private var perms = JSONObject()
+    private var stepNo = 0
+    private var epoch = 0
+    private var nextOffset = 0
+    private var lastShown = 0
+
+    // ---- ব্যর্থতার সিঁড়ি ----
+    private var fails = 0
+    private var replans = 0
+    private var sameState = 0
+    private var lastStateKey = ""
+    private var lastActionSig = ""
+    private var warn: String? = null
+    private var pendingImage: String? = null
+    private var lastOutcomeText: String? = null
+    private var lastObs: Observation? = null
+    private var captchaIgnoreSteps = 0
+    private var obsFails = 0
+
+    // ---- হস্তান্তর / প্রশ্ন ----
+    private var handoffKind: String? = null
+    private var handoffHash = ""
+    private var handoffUrl = ""
+    private var awaitingInputs = false
+    private var otpWaiting = false
+    private var otpAttempts = 0          // একই রানে OTP-অনুরোধ — বারবার ব্যর্থ হলে অন্তহীন ঘোরা নয়
+    private var pendingConfirm: List<AgentAction> = emptyList()
+
+    // ---- ইভেন্ট (WebViewClient/ChromeClient থেকে) ----
+    private var navStarted = false
+    private var navFinished: CompletableDeferred<Unit>? = null
+    private var lastError: String? = null
+    private val events = ArrayList<String>()
+    var acceptNextDialog = false
+    private var currentUploadRef = "file"
+    private val fileRefs = HashMap<String, Uri>()
+    private var fileDeferred: CompletableDeferred<String>? = null
+
+    private val obsJs: String by lazy { host.context.assets.open("lp_observe.js").bufferedReader().use { it.readText() } }
+    private val actJs: String by lazy { host.context.assets.open("lp_act.js").bufferedReader().use { it.readText() } }
+    private val web: WebView get() = host.webView
+
+    // =================================================================== শুরু / resume
+    fun begin(goalText: String, systemMode: String) {
+        cancelLoop()
+        goal = goalText; system = systemMode; goalExtra = ""
+        resetRunState()
+        job = scope.launch {
+            host.setStatus("Building a plan…")
+            val planned = requestPlan(replan = false, reason = "")
+            if (planned == null) { host.fallbackToLegacy(); return@launch }   // v2 বন্ধ বা সার্ভার পুরনো
+            plan = planned
+            persist()
+            val needs = plan.optJSONArray("inputs_needed")
+            if (needs != null && needs.length() > 0) {
+                // শুরুতেই একবার সব তথ্য জিজ্ঞেস — মাঝপথে বারবার নয়
+                val q = StringBuilder("Before starting, a few details are needed at once:\n")
+                for (i in 0 until needs.length()) q.append("• ").append(needs.optJSONObject(i)?.optString("ask").orEmpty()).append('\n')
+                q.append("Please write everything in one message.")
+                awaitingInputs = true
+                host.onAskUser(q.toString())
+                return@launch
+            }
+            startLoop()
+        }
+    }
+
+    /** অ্যাক্টিভিটি মরে গেলে ডিস্ক থেকে ফিরে আসা। */
+    fun resumeFrom(state: JSONObject): Boolean {
+        return try {
+            cancelLoop()
+            runId = state.optString("run_id", runId); goal = state.optString("goal"); system = state.optString("system", "super_1_2")
+            plan = state.optJSONObject("plan") ?: return false
+            ledger = Ledger(state.optJSONObject("ledger") ?: JSONObject())
+            perms = state.optJSONObject("permissions") ?: JSONObject()
+            history.clear(); state.optJSONArray("history")?.let { for (i in 0 until it.length()) history.add(it.optString(i)) }
+            // v47: সার্চ-তালিকা আর ইউজারের কথা সরাসরি সংরক্ষিত — লেখা-প্যাটার্ন খুঁজে ফেরানো হয় না
+            searched.clear(); state.optJSONArray("searched")?.let { for (i in 0 until it.length()) it.optString(i).takeIf { q -> q.isNotBlank() }?.let { q -> searched.add(q) } }
+            userNotes.clear(); state.optJSONArray("user_notes")?.let { for (i in 0 until it.length()) it.optString(i).takeIf { q -> q.isNotBlank() }?.let { q -> userNotes.add(q) } }
+            fails = 0; replans = 0; sameState = 0
+            lastOutcomeText = "The app restarted and is continuing the same task"
+            val u = state.optString("url", "")
+            if (u.startsWith("http://") || u.startsWith("https://")) {
+                navFinished = CompletableDeferred(); navStarted = true
+                web.loadUrl(u)
+            }
+            startLoop(); true
+        } catch (e: Exception) { false }
+    }
+
+    private fun resetRunState() {
+        runId = UUID.randomUUID().toString().replace("-", "").take(24)
+        ledger = Ledger(); history.clear(); searched.clear(); userNotes.clear(); perms = JSONObject(); stepNo = 0; epoch = 0; nextOffset = 0; lastShown = 0
+        fails = 0; replans = 0; sameState = 0; lastStateKey = ""; lastActionSig = ""; warn = null; pendingImage = null
+        lastOutcomeText = null; lastObs = null; handoffKind = null; awaitingInputs = false; otpWaiting = false; otpAttempts = 0; pendingConfirm = emptyList()
+        captchaIgnoreSteps = 0; obsFails = 0; events.clear(); lastError = null
+    }
+
+    private fun startLoop() {
+        active = true
+        host.onRunStateChanged(true)
+        // প্ল্যানে "এই URL-এ যাও" যান্ত্রিক ধাপ/start_url থাকলে LLM ছাড়াই সরাসরি (সিদ্ধান্ত নিয়েছে প্ল্যানার AI)
+        job?.cancel()
+        job = scope.launch { loop() }
+    }
+
+    fun cancelLoop() { job?.cancel(); job = null; active = false; handoffKind = null; if (otpWaiting) { otpWaiting = false; host.stopOtpAssist() } }
+
+    /** AI সুইচ বন্ধ বা ইউজার থামালে — লেজার/প্ল্যান ডিস্কে থাকে। */
+    fun pause() { job?.cancel(); job = null; active = false; persist(); host.onRunStateChanged(false) }
+    fun resume() { if (plan.length() > 0 && !awaitingInputs) startLoop() }
+
+    fun finishAndClear() {
+        job?.cancel(); job = null; active = false
+        AgentStateStore.clear(host.context)
+        host.onRunStateChanged(false)
+    }
+
+    // =================================================================== ইউজার-ইনপুট
+    /** v47: ইউজারের প্রতিটি কথা আলাদা তালিকায় — সার্ভার প্রতি ধাপে পুরোটা দেখে (আগে শুধু ইতিহাসের শেষ ৮ লাইনে ছিল, তাই ভুলে যেত)। */
+    private fun rememberUserNote(text: String) {
+        val t = text.trim().take(400)
+        if (t.isEmpty() || t == "(sent an image)") return
+        if (userNotes.lastOrNull() == t) return
+        userNotes.add(t)
+        while (userNotes.size > 30) userNotes.removeAt(0)
+        persist()
+    }
+
+    fun provideUserText(text: String, imageBase64: String?) {
+        rememberUserNote(text)
+        if (text.isNotBlank()) history.add("The user said: ${text.take(300)}")
+        if (imageBase64 != null) pendingImage = imageBase64
+        if (otpWaiting) { otpCopied(); return }      // ইউজার "হয়ে গেছে/চালিয়ে যাও" বলেছে — ক্লিপবোর্ড থেকে কোড নিয়ে বসাই
+        if (awaitingInputs) {
+            awaitingInputs = false
+            startLoop(); return
+        }
+        if (handoffKind == "captcha") captchaIgnoreSteps = 3     // ইউজার নিজে "এগোও" বলেছে — ভুল-সতর্কে আটকাবে না
+        handoffKind = null
+        fails = 0; replans = 0
+        lastOutcomeText = "The user responded: ${text.take(120)}"
+        startLoop()
+    }
+
+    /** চলার সময় নতুন কথা — থামায় না, পরের ধাপে ইতিহাসে যোগ হয়। */
+    fun nudge(text: String, imageBase64: String?) {
+        rememberUserNote(text)
+        history.add("The user said something new: ${text.take(300)}")
+        if (imageBase64 != null) pendingImage = imageBase64
+    }
+
+    // =================================================================== WebView ইভেন্ট (host থেকে)
+    fun onNavStarted() { navStarted = true }
+    fun onPageFinished() { navFinished?.complete(Unit) }
+    fun noteError(e: String) { lastError = e }
+    fun noteDialog(kind: String, text: String) { events.add("dialog($kind: ${text.take(80)})") }
+    fun noteEvent(e: String) { events.add(e) }
+
+    /** WebChromeClient.onShowFileChooser */
+    fun handleFileChooser(cb: ValueCallback<Array<Uri>>): Boolean {
+        val known = fileRefs[currentUploadRef]
+        if (known != null) { cb.onReceiveValue(arrayOf(known)); fileDeferred?.complete("used:$currentUploadRef"); return true }
+        host.setStatus("📎 Choose the file, then I will continue")
+        host.pickFile(currentUploadRef, ValueCallback<Array<Uri>> { uris ->
+            val first = uris?.firstOrNull()
+            if (first != null) fileRefs[currentUploadRef] = first
+            cb.onReceiveValue(uris)
+            fileDeferred?.complete(if (first != null) "picked" else "cancelled")
+        })
+        return true
+    }
+
+    // =================================================================== মূল লুপ
+    private suspend fun loop() {
+        // শুরুর যান্ত্রিক নেভিগেশন — LLM ছাড়া
+        if (stepNo == 0 && ledger.json.length() == 0) {
+            val start = plan.optString("start_url", "").ifBlank {
+                plan.optJSONArray("subgoals")?.optJSONObject(0)?.optJSONObject("mechanical")?.optString("url", "").orEmpty()
+            }
+            if (start.startsWith("http://") || start.startsWith("https://")) {
+                val o = navigateTo(start)
+                history.add(o.text("navigate(plan)"))
+                lastOutcomeText = o.text("navigate(plan)")
+            }
+            plan.optJSONArray("subgoals")?.optJSONObject(0)?.optString("id")?.let { ledger.subgoal = it }
+            markMechDone(ledger.subgoal)
+        }
+        val checkIn = if (system == "ela_4n") STEP_LIMIT_CHECKIN_4N else STEP_LIMIT_CHECKIN
+        while (active && host.isAiOn()) {
+            // যান্ত্রিক ধাপ (প্ল্যানার AI ঠিক করেছে "এই URL-এ যাও") — LLM কল ছাড়া সরাসরি নেভিগেট
+            val mech = pendingMechanicalUrl()
+            if (mech != null) {
+                stepNo++
+                val o = navigateTo(mech)
+                history.add(o.text("navigate(plan)")); lastOutcomeText = o.text("navigate(plan)")
+                markMechDone(ledger.subgoal); persist()
+                continue
+            }
+            stepNo++
+            if (stepNo % checkIn == 0) {
+                // পজ নয় — অগ্রগতি দেখিয়ে নিজে চলতে থাকে
+                host.setStatus("📊 Check-in: $stepNo steps, ${ledger.doneItems} items done. Continuing…")
+            }
+            val obs = observeWithRetry()
+            if (obs == null) {
+                fails++; obsFails++
+                lastOutcomeText = "Could not read the page (still loading?)"
+                if (obsFails >= OBSERVE_FAIL_LIMIT) {
+                    // BUGFIX: আগে পেজ বারবার না পড়া গেলে লুপ চুপচাপ ঘুরতেই থাকত (সিঁড়ি obs ছাড়া চলে না) —
+                    // এখন ইউজারকে জানিয়ে থামে; "চালিয়ে যাও" লিখলে একই জায়গা থেকে আবার চেষ্টা।
+                    obsFails = 0
+                    active = false; persist(); host.onRunStateChanged(false)
+                    host.onAskUser("I cannot read the page (it is not loading, or it is blocked). Wait a moment and type \"continue\" above, or tell me another site or approach.")
+                    return
+                }
+                delay(400); continue
+            }
+            obsFails = 0
+            lastObs = obs
+            ledger.noteVisited(obs.url)
+
+            // কাঠামোগত ক্যাপচা-iframe (শব্দ-ভিত্তিক নয়) — মানুষের কাজ
+            if (obs.captchaFrame) {
+                if (captchaIgnoreSteps > 0) captchaIgnoreSteps-- else { handoff("captcha", "🔒 A captcha appeared. A person must complete it, so I did not touch it. Please solve it and I will continue automatically.", obs); return }
+            }
+
+            // লুপ-ব্রেক: একই পেজ-অবস্থা + একই অ্যাকশন ফিরলে (মডেলের বার্তা নয়, আসল অবস্থা তুলনা)
+            val stateKey = obs.hash + "|" + lastActionSig
+            sameState = if (stateKey == lastStateKey) sameState + 1 else 0
+            lastStateKey = stateKey
+            if (sameState >= 2) { fails++; sameState = 0; ledger.noteFail("same_state") }
+
+            // সিঁড়ির ধাপ ৫: পুনঃপরিকল্পনা
+            if (fails >= 4 && replans < MAX_REPLANS) {
+                host.setStatus("🧭 Re-planning…")
+                val np = requestPlan(replan = true, reason = "Failed repeatedly: " + lastOutcomeText.orEmpty().take(200), obs = obs)
+                replans++
+                if (np != null) { plan = np; persist(); warn = null; lastOutcomeText = "A new plan was created" }
+                fails = 0
+                continue
+            }
+            val level = when {
+                fails >= 4 -> "ask"          // পুনঃপরিকল্পনাও ফুরিয়েছে → ইউজারকে নির্দিষ্ট প্রশ্ন
+                fails == 3 -> "vision"
+                fails == 2 -> "alt"
+                replans > 0 && fails == 0 && stepNo > 0 && lastOutcomeText == "A new plan was created" -> "replan"
+                else -> ""
+            }
+            // ধাপ ৪ (Super 1.2): সিঁড়িতে ১ বার স্ক্রিনশট; ELA-তে মডেল নিজে need_vision চায়
+            if (level == "vision" && system == "super_1_2" && ledger.vision < 1 && pendingImage == null) {
+                pendingImage = captureScreenshot(); ledger.vision = ledger.vision + 1
+            }
+
+            val dec = requestDecision(obs, level) ?: return   // সংযোগ/টোকেন সমস্যায় লুপ থেমেছে (host জানানো হয়েছে)
+            // v28: "তদারকি…" লেখা নয় — শুধু ছোট 🛡 আইকন; আসল লেখা সবসময় "এখন কী করছি"
+            val supIcon = if (dec.supervisorNote != null) "🛡 " else ""
+            if (dec.note.isNotBlank()) host.setStatus(supIcon + dec.note)
+            else if (dec.actions.isNotEmpty()) host.setStatus(supIcon + dec.actions.first().humanStatus())
+            warn = dec.warn
+            ledger.mergeFacts(dec.facts)
+            dec.visionUsed?.let { ledger.vision = it }
+
+            if (dec.degraded) {            // দুবারেও অবৈধ উত্তর — নীরবে থামা নয়, সিঁড়িতে এক ধাপ
+                fails++; ledger.noteFail("invalid_reply"); delay(300); continue
+            }
+
+            when (dec.status) {
+                "task_done" -> { history.add("task_done ✔"); host.onTaskFinished(dec.note.ifBlank { "Task finished. Please review the result." }); finishAndClear(); return }
+                "subgoal_done" -> { advanceSubgoal(); history.add("subgoal_done → ${ledger.subgoal}"); lastOutcomeText = "Sub-goal finished. Moving to the next one"; fails = 0; persist(); continue }
+                "item_done" -> { ledger.itemDone(dec.note.ifBlank { "item" }); history.add("item_done #${ledger.loopIndex}"); lastOutcomeText = "Item #${ledger.loopIndex} complete"; fails = 0; persist(); continue }
+                "blocked" -> { handleBlocked(dec, obs); return }
+                "need_vision" -> {
+                    pendingImage = captureScreenshot(); lastOutcomeText = "Screenshot taken"
+                    // পরের ধাপে ছবিসহ (level=vision)
+                    fails = maxOf(fails, 3); continue
+                }
+                "replan" -> { fails = maxOf(fails, 4); continue }
+            }
+
+            // ---- অ্যাকশন চালানো (ব্যাচ) ----
+            val outcomes = ArrayList<String>()
+            var failedHere = false
+            for (a in dec.actions) {
+                host.setStatus(a.humanStatus())
+                val o = executeAction(a)
+                val line = o.text(a.brief())
+                outcomes.add(line); history.add(line)
+                lastActionSig = a.brief()
+                if (o.failed) { failedHere = true; ledger.noteFail(a.brief()); break }
+                if (o.result == "ok") fails = 0
+            }
+            if (failedHere) fails++
+            while (history.size > 40) history.removeAt(0)
+            lastOutcomeText = outcomes.joinToString(" ; ").take(900)
+            persist()
+        }
+    }
+
+    // =================================================================== সার্ভার কল
+    private fun baseUrl() = host.context.getString(R.string.space_base_url)
+
+    private suspend fun requestPlan(replan: Boolean, reason: String, obs: Observation? = null): JSONObject? {
+        val body = JSONObject().apply {
+            put("goal", goal + goalExtra); put("system", system); put("replan", replan); put("reason", reason)
+            if (userNotes.isNotEmpty()) put("user_notes", JSONArray(userNotes))
+            com.hemel.lenspilot.Prefs.userInfoJsonArrayOrNull(host.context)?.let { put("user_info", it) }
+            if (!replan) {
+                // v28: কোন পেজে আছি জানালে প্ল্যানার সাইট ছেড়ে গুগলে ফেরে না
+                try {
+                    // WebView-কে শুধু main thread-এ ছোঁয়া যায়
+                    val (u, t) = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                        web.url.orEmpty() to web.title.orEmpty()
+                    }
+                    if (u.startsWith("http")) put("current_page", JSONObject().put("url", u).put("title", t))
+                    // ভল্টের শিরোনাম+ফিল্ডের নাম (মান নয়) — প্ল্যানার জানে লগইন ভল্ট থেকে হবে
+                    val vi = SecretVault.promptIndex(host.context, goal, u, t)
+                    if (vi.length() > 0) put("vault", vi)
+                } catch (e: Exception) { /* ignore */ }
+            }
+            if (replan) {
+                put("ledger", ledger.json)
+                obs?.let {
+                    put("page", JSONObject().apply {
+                        put("url", it.url); put("title", it.title)
+                        put("elements", it.raw.optJSONArray("elements") ?: JSONArray())
+                        put("digest", it.raw.optJSONArray("digest") ?: JSONArray())
+                    })
+                }
+            }
+        }
+        val r = ApiClient.callAuthed(host.context, baseUrl(), "/api/browser-plan", body.toString())
+        val s = r.getOrNull() ?: return null
+        return try {
+            val o = JSONObject(s)
+            if (o.optInt("agent_v", 1) != 2) null else o.optJSONObject("plan")
+        } catch (e: Exception) { null }
+    }
+
+    private suspend fun requestDecision(obs: Observation, level: String): AgentDecision? {
+        val image = pendingImage; pendingImage = null
+        val body = JSONObject().apply {
+            put("agent_v", 2); put("goal", goal + goalExtra); put("system", system)
+            put("plan", plan); put("ledger", ledger.json)
+            put("observation", obs.raw)
+            put("last_outcome", JSONObject().put("text", lastOutcomeText ?: "(no action taken yet)"))
+            put("history", JSONArray(history.takeLast(8)))
+            if (searched.isNotEmpty()) put("searched", JSONArray(searched.takeLast(12)))
+            if (userNotes.isNotEmpty()) put("user_notes", JSONArray(userNotes))
+            put("ladder", JSONObject().put("level", level).put("fails", fails).put("same_state", sameState))
+            put("permissions", perms); put("run_id", runId); put("step_number", stepNo)
+            warn?.let { put("warn", it) }
+            if (image != null) put("image_base64", image)
+            // গোপন ভল্ট: শুধু প্রাসঙ্গিক শিরোনাম + ফিল্ডের নাম। মান কখনো নয়।
+            SecretVault.promptIndex(host.context, goal, obs.url, obs.title).let { if (it.length() > 0) put("vault", it) }
+            com.hemel.lenspilot.Prefs.userInfoJsonArrayOrNull(host.context)?.let { put("user_info", it) }
+        }
+        var attempt = 0
+        while (true) {
+            val r = ApiClient.callAuthed(host.context, baseUrl(), "/api/browser-action", body.toString())
+            val s = r.getOrNull()
+            if (s != null) {
+                // ভাঙা উত্তর = ব্যর্থ ধাপ (সিঁড়িতে এক ধাপ), লুপ থামে না
+                return try { AgentDecision.parse(JSONObject(s)) } catch (e: Exception) { degradedDecision() }
+            }
+            val msg = r.exceptionOrNull()?.message.orEmpty()
+            if (msg.contains("TOKEN_LIMIT")) {
+                active = false; persist(); host.onRunStateChanged(false)
+                host.onAskUser("Tokens used up. Watch an ad to earn tokens, then type \"continue\" above to resume from the same point."); return null
+            }
+            if (msg.contains("V2_OFF")) { host.fallbackToLegacy(); return null }
+            attempt++
+            if (attempt >= ELEMENT_RETRY) {
+                active = false; persist(); host.onRunStateChanged(false)
+                host.onAskUser("Network problem. Once it is fixed, type \"continue\" above and it will resume from the same point."); return null
+            }
+            host.setStatus("Network problem. Retrying ($attempt)…")
+            delay(1000L * (1 shl (attempt - 1)))
+        }
+    }
+
+    private fun degradedDecision() = AgentDecision("continue", emptyList(), "", null, null, null, null, emptyList(),
+        JSONObject(), null, null, true, null)
+
+    // =================================================================== সংকেত: সিদ্ধান্তের পর
+    private fun currentSubgoalJson(): JSONObject? {
+        val subs = plan.optJSONArray("subgoals") ?: return null
+        for (i in 0 until subs.length()) if (subs.optJSONObject(i)?.optString("id") == ledger.subgoal) return subs.optJSONObject(i)
+        return null
+    }
+
+    private fun markMechDone(id: String) {
+        val arr = ledger.json.optJSONArray("mech_done") ?: JSONArray().also { ledger.json.put("mech_done", it) }
+        for (i in 0 until arr.length()) if (arr.optString(i) == id) return
+        arr.put(id)
+    }
+
+    private fun pendingMechanicalUrl(): String? {
+        val sg = currentSubgoalJson() ?: return null
+        val url = sg.optJSONObject("mechanical")?.optString("url", "").orEmpty()
+        if (!(url.startsWith("http://") || url.startsWith("https://"))) return null
+        val arr = ledger.json.optJSONArray("mech_done")
+        if (arr != null) for (i in 0 until arr.length()) if (arr.optString(i) == ledger.subgoal) return null
+        return url
+    }
+
+    private fun advanceSubgoal() {
+        val subs = plan.optJSONArray("subgoals") ?: return
+        var idx = -1
+        for (i in 0 until subs.length()) if (subs.optJSONObject(i)?.optString("id") == ledger.subgoal) idx = i
+        if (idx >= 0 && idx + 1 < subs.length()) ledger.subgoal = subs.optJSONObject(idx + 1)?.optString("id") ?: ledger.subgoal
+    }
+
+    private suspend fun handleBlocked(dec: AgentDecision, obs: Observation) {
+        val kind = dec.blockedKind ?: "missing_info"
+        val msg = dec.blockedMessage ?: "I need your help here."
+        when (kind) {
+            "confirm_irreversible" -> {
+                pendingConfirm = dec.pendingActions
+                active = false
+                host.confirmIrreversible(msg) { choice ->
+                    when (choice) {
+                        "STOP" -> { host.onAskUser("OK, I stopped. Tell me what to do."); }
+                        else -> {
+                            if (choice == "ALL") perms.put("allow_irreversible", true)
+                            scope.launch { runPendingThenContinue(choice == "ALL") }
+                        }
+                    }
+                }
+            }
+            // account_issue: সাসপেন্ড/লক/আইডি-যাচাই — এজেন্ট নিজে সারাতে পারে না; ইউজারকে সত্যিটা বলে থামে (মিথ্যে "হয়ে গেছে" নয়, অন্য সাইটে ঘোরাও নয়)
+            "missing_info", "account_issue" -> { active = false; host.onRunStateChanged(false); host.onAskUser(msg) }
+            "choice" -> askChoiceFlow(dec, msg, obs)
+            "need_secret" -> askSecretFlow(dec, msg, obs)
+            "otp" -> beginOtp(dec, msg, obs)
+            else -> handoff(kind, msg, obs)    // captcha | login | payment
+        }
+    }
+
+    private suspend fun runPendingThenContinue(all: Boolean) {
+        active = true; host.onRunStateChanged(true)
+        val outs = ArrayList<String>()
+        for (a in pendingConfirm) {
+            val o = executeAction(a)
+            val line = o.text(a.brief() + "[confirmed]"); outs.add(line); history.add(line)
+            if (o.failed) break
+        }
+        pendingConfirm = emptyList()
+        lastOutcomeText = outs.joinToString(" ; ").take(900)
+        job?.cancel(); job = scope.launch { loop() }
+    }
+
+    // ---------------------------------------------------------------- একাধিক বিকল্প → ইউজার বাছে
+    private fun askChoiceFlow(dec: AgentDecision, msg: String, obs: Observation) {
+        val arr = dec.blockedExtra?.optJSONArray("options")
+        val opts = ArrayList<String>()
+        if (arr != null) for (i in 0 until arr.length()) arr.optString(i).trim().takeIf { it.isNotEmpty() }?.let { opts.add(it.take(60)) }
+        active = false; host.onRunStateChanged(false)
+        if (opts.size < 2) { host.onAskUser(msg); return }       // বিকল্প ঠিকমতো আসেনি — সাধারণ প্রশ্ন
+        host.askChoice(msg, opts.take(6)) { picked ->
+            if (picked == null) {
+                userDoesIt(obs, "OK. Please choose/do it yourself. Tap \"Done\" when finished and I will continue from the next step.")
+            } else {
+                // পছন্দ লেজারে — একই প্রশ্ন আর করা হবে না
+                ledger.mergeFacts(JSONObject().put("Choice: " + msg.take(26), picked))
+                history.add("The user chose: ${picked.take(60)}")
+                lastOutcomeText = "The user selected: ${picked.take(60)}"
+                fails = 0; replans = 0
+                persist(); startLoop()
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------- ভল্টে নেই → আলাদা সুরক্ষিত বক্স
+    private fun askSecretFlow(dec: AgentDecision, msg: String, obs: Observation) {
+        val sec = dec.blockedExtra?.optJSONObject("secret")
+        val title = sec?.optString("title").orEmpty().trim()
+        val field = sec?.optString("field").orEmpty().trim()
+        val kind = sec?.optString("kind", "other").orEmpty()
+        active = false; host.onRunStateChanged(false)
+        if (title.isBlank() || field.isBlank()) { host.onAskUser(msg); return }
+        host.askSecret(title, field, kind) { saved ->
+            if (saved) {
+                history.add("['${SecretVault.refText(title, field)}' added to the vault]")
+                lastOutcomeText = "'${SecretVault.refText(title, field)}' is saved in the vault. Now enter it with type_secret (you cannot see the value)."
+                fails = 0; persist(); startLoop()
+            } else {
+                userDoesIt(obs, "OK. Please type it yourself. Tap \"Done\" when finished.")
+            }
+        }
+    }
+
+    /** ইউজার নিজে করবে — লুপ থামে; "হয়ে গেছে" চাপলে বা URL বদলালে পরের ধাপ থেকে চলে। */
+    private fun userDoesIt(obs: Observation, message: String) {
+        handoff("user_fill", message, obs)
+    }
+
+    // ---------------------------------------------------------------- OTP: অ্যাপ খোলা + গাইডলাইন + ফিরে এসে বসানো
+    private fun beginOtp(dec: AgentDecision, msg: String, obs: Observation) {
+        val o = dec.blockedExtra?.optJSONObject("otp")
+        val source = o?.optString("source", "other").orEmpty().ifBlank { "other" }
+        val app = o?.optString("app").orEmpty()
+        otpAttempts++
+        if (otpAttempts > 3) {
+            // কোড তিনবার ব্যর্থ: আর অনুমান/ঘোরা নয় — ইউজারকে বলি
+            active = false; job?.cancel(); job = null; host.onRunStateChanged(false)
+            host.onAskUser("The code failed 3 times. Please check the number, request a new code on the site yourself, or tell me what to do.")
+            return
+        }
+        active = false
+        job?.cancel(); job = null
+        handoffKind = "otp"; handoffHash = obs.hash; handoffUrl = obs.url
+        otpWaiting = true
+        history.add("[otp: going to fetch the code from ${OtpSupport.sourceLabel(source, app)}]"); persist()
+        host.onRunStateChanged(false)
+        host.onHandoff("otp", msg.ifBlank { "An OTP is required. Opening ${OtpSupport.sourceLabel(source, app)}." })
+        val opened = host.startOtpAssist(source, app)
+        if (!opened) host.setStatus("Could not open the app automatically. Open ${OtpSupport.sourceLabel(source, app)}, copy the code, return here and tap \"Done\".")
+    }
+
+    /** কন্ট্রোল-বারের "কপি হয়েছে" চাপলে (বা ইউজার ফিরে এসে বললে): ক্লিপবোর্ড → OTP বক্স; AI কোড দেখে না। */
+    fun otpCopied() {
+        if (!otpWaiting) return
+        scope.launch {
+            var code: String? = null
+            for (i in 0 until 4) {                       // ফোকাস ফেরার মুহূর্তে ক্লিপবোর্ড কখনো খালি আসে — অল্প ধৈর্য
+                code = OtpSupport.extractCode(OtpSupport.clipboardText(host.context))
+                if (code != null) break
+                delay(350)
+            }
+            if (code == null) {
+                host.setStatus("No copied code found. Copy the code from the message and tap \"Copied\" again.")
+                return@launch
+            }
+            otpWaiting = false; handoffKind = null
+            host.stopOtpAssist()
+            host.setStatus("Entering the code…")
+            js(actJs + "\nwindow.__lp.begin();")
+            val res = parseRunResult(js("window.__lp.run(" + JSONObject().put("type", "paste_otp").put("text", code).toString() + ")") ?: "")
+            code = null
+            OtpSupport.clearClipboard(host.context)      // কোড ক্লিপবোর্ডে পড়ে থাকে না
+            val ok = res.optString("result") == "ok"
+            val line = if (ok) "paste_otp → ok (code entered in the box, value hidden)"
+                       else "paste_otp → ${res.optString("result", "error")}(${res.optString("detail")})"
+            history.add(line)
+            lastOutcomeText = if (ok) "otp_pasted: The code was entered in the OTP box. Now press the Verify/Submit button."
+                              else "otp_paste_failed(${res.optString("detail")}): OTP box not found. Inspect the page and fix it yourself."
+            awaitSettle(700)
+            fails = 0; replans = 0
+            persist(); startLoop()
+        }
+    }
+
+    /** সব হস্তান্তর একই পথে: PAUSE + কারণ + ইউজার শেষ করলে নিজে চালু। */
+    private fun handoff(kind: String, message: String, obs: Observation) {
+        active = false
+        handoffKind = kind; handoffHash = obs.hash; handoffUrl = obs.url
+        history.add("[handoff:$kind]"); persist()
+        host.onRunStateChanged(false)
+        host.onHandoff(kind, message)
+        job?.cancel()
+        job = scope.launch {
+            while (handoffKind != null) {
+                delay(HANDOFF_POLL_MS)
+                val o = observe(budget = 200) ?: continue
+                val resolved = when (kind) {
+                    "captcha" -> !o.captchaFrame
+                    "user_fill" -> o.url != handoffUrl      // টাইপ করার সময় পেজ-হ্যাশ বদলায় — শুধু URL বা \"হয়ে গেছে\" বাটনে এগোই
+                    else -> o.url != handoffUrl || o.hash != handoffHash
+                }
+                if (resolved) {
+                    handoffKind = null
+                    lastOutcomeText = "user_handoff_finished($kind): the page has changed. Verify and continue."
+                    history.add("[handoff:$kind → finished]")
+                    host.setStatus("✅ Thank you. Continuing…")
+                    fails = 0
+                    startLoop()
+                    return@launch
+                }
+            }
+        }
+    }
+
+    // =================================================================== পর্যবেক্ষণ
+    private suspend fun js(script: String): String? = suspendCancellableCoroutine { c ->
+        web.evaluateJavascript(script) { c.resume(it) }
+    }
+
+    private fun unwrap(raw: String?): String {
+        if (raw.isNullOrEmpty() || raw == "null") return ""
+        return try { JSONObject("""{"v":$raw}""").getString("v") } catch (e: Exception) { raw.trim('"') }
+    }
+
+    private suspend fun observe(budget: Int = OBSERVE_BUDGET_TOKENS, offset: Int = 0): Observation? {
+        epoch++
+        val needDigest = plan.optBoolean("needs_reading", false) || system == "ela_1st" || system == "ela_4n"
+        val digestChars = when (system) { "super_lite" -> 700; "super_1_2" -> 1000; else -> 1600 }
+        val opts = JSONObject().put("epoch", epoch).put("budget", budget).put("offset", offset)
+            .put("digest", needDigest).put("digestChars", digestChars)
+        val raw = js(obsJs + "\nwindow.__lp.observe(" + opts.toString() + ");")
+        return Observation.parse(unwrap(raw))
+    }
+
+    private suspend fun observeWithRetry(): Observation? {
+        val off = nextOffset; nextOffset = 0
+        for (i in 0 until ELEMENT_RETRY) {
+            if (navStarted) waitForNavigation()
+            val o = observe(offset = off)
+            if (o != null) { lastShown = o.shown; return o }
+            delay(250)
+        }
+        return null
+    }
+
+    private suspend fun waitForNavigation() {
+        val d = navFinished ?: CompletableDeferred<Unit>().also { navFinished = it }
+        withTimeoutOrNull(NAV_WATCHDOG_MS) { d.await() }
+        navStarted = false; navFinished = null
+        awaitSettle(900)
+    }
+
+    /** স্থির পুরো-অপেক্ষার বদলে অবস্থা-ভিত্তিক: DOM ~১২০ms শান্ত + readyState (স্পেক B11.২)। */
+    private suspend fun awaitSettle(maxMs: Long = SETTLE_MAX_MS) {
+        val t0 = SystemClock.uptimeMillis()
+        while (SystemClock.uptimeMillis() - t0 < maxMs) {
+            val q = unwrap(js("(window.__lp && window.__lp.quiet) ? window.__lp.quiet() : ''"))
+            if (q.isEmpty()) { delay(80); if (!navStarted) return else continue }
+            try {
+                val o = JSONObject(q)
+                if (o.optLong("sinceLast") >= SETTLE_QUIET_MS && o.optString("ready") != "loading") return
+            } catch (e: Exception) { return }
+            delay(60)
+        }
+    }
+
+    // =================================================================== অ্যাকশন
+    private fun drainEvents(): String { val s = events.joinToString(", "); events.clear(); return s }
+
+    /** v46: ভাঙা (mojibake) বা অর্ধেক-percent URL লোড করা হয় না — Google-এ আবোল-তাবোল সার্চ হতো। */
+    private fun isGarbledUrl(url: String): Boolean {
+        val d = try { java.net.URLDecoder.decode(url.replace("+", "%20"), "UTF-8") } catch (e: Exception) { return true }
+        val marks = d.count { it == 'Ã' || it == 'Â' || it == 'à' || it == 'Ð' || it == 'Ñ' || it == '¦' || it == '§' || it == '\uFFFD' }
+        return marks >= 3
+    }
+
+    private suspend fun navigateTo(url: String): Outcome {
+        if (isGarbledUrl(url)) return Outcome("error", detail = "garbled_url_do_not_hand_encode — use search with plain words")
+        val before = web.url.orEmpty()
+        lastError = null
+        navFinished = CompletableDeferred(); navStarted = true
+        web.loadUrl(url)
+        withTimeoutOrNull(NAV_WATCHDOG_MS + 1500) { navFinished?.await() }
+        navStarted = false; navFinished = null
+        awaitSettle(900)
+        return afterNavigation(before)
+    }
+
+    /**
+     * পেজ বদলালে এআই-কে জানানোর সংকেত: কোথা থেকে কোথায় গেল (হোস্ট+পাথ), আর সাইটই বদলালে আলাদা সংকেত —
+     * যাতে ভুল পেজে চলে গেলে এআই সেটা ধরে নিজেই go_back/ঠিক পথে ফিরতে পারে। (শুধু তথ্য; সিদ্ধান্ত এআই-র।)
+     */
+    private fun urlChangeFlags(before: String, now: String): List<String> {
+        if (now == before) return emptyList()
+        fun short(u: String): String = try {
+            val x = android.net.Uri.parse(u)
+            ((x.host ?: "").removePrefix("www.") + (x.path ?: "").trimEnd('/')).take(70)
+        } catch (e: Exception) { u.take(70) }
+        fun hostOf(u: String): String = try { (android.net.Uri.parse(u).host ?: "").removePrefix("www.") } catch (e: Exception) { "" }
+        val out = ArrayList<String>()
+        out.add("url_changed(from=${short(before)} → to=${short(now)})")
+        val hb = hostOf(before); val hn = hostOf(now)
+        if (hb.isNotEmpty() && hn.isNotEmpty() && hb != hn) out.add("site_changed($hb → $hn)")
+        return out
+    }
+
+    private fun afterNavigation(before: String): Outcome {
+        val err = lastError; lastError = null
+        val now = web.url.orEmpty()
+        val flags = ArrayList<String>()
+        flags.addAll(urlChangeFlags(before, now))
+        val ev = drainEvents()
+        return if (err != null) Outcome("error", flags, detail = err, extra = ev)
+        else Outcome("ok", flags, extra = (if (web.title.isNullOrBlank()) "" else "title=\"${web.title.orEmpty().take(40)}\"") + (if (ev.isNotBlank()) " $ev" else ""))
+    }
+
+    private fun resExtra(res: JSONObject): String {
+        val parts = ArrayList<String>()
+        if (res.has("atBottom")) parts.add("atBottom=" + res.optBoolean("atBottom"))
+        if (res.has("atTop")) parts.add("atTop=" + res.optBoolean("atTop"))
+        if (res.optString("via").isNotBlank()) parts.add("via=" + res.optString("via"))
+        return parts.joinToString(" ")
+    }
+
+    private fun parseRunResult(raw: String): JSONObject = try { JSONObject(unwrap(raw)) } catch (e: Exception) { JSONObject().put("result", "error").put("detail", "page_changed") }
+
+    private suspend fun executeAction(a: AgentAction): Outcome {
+        val j = a.json
+        return try {
+            when (a.type) {
+                "navigate" -> navigateTo(j.optString("url"))
+                "search" -> {
+                    val q = j.optString("query").trim()
+                    if (q.isEmpty()) Outcome("error", detail = "empty_query")
+                    else {
+                        if (q !in searched) searched.add(q)
+                        val base = if (j.optString("mode") == "ai") "https://www.google.com/search?udm=50&q=" else "https://www.google.com/search?q="
+                        navigateTo(base + URLEncoder.encode(q, "UTF-8"))
+                    }
+                }
+                "go_back" -> {
+                    if (!web.canGoBack()) Outcome("no_effect", detail = "no_history")
+                    else { val b = web.url.orEmpty(); lastError = null; navFinished = CompletableDeferred(); navStarted = true; web.goBack()
+                        withTimeoutOrNull(NAV_WATCHDOG_MS) { navFinished?.await() }; navStarted = false; navFinished = null; awaitSettle(900); afterNavigation(b) }
+                }
+                "wait" -> { delay(j.optLong("ms", 600).coerceIn(100, 5000)); Outcome("ok") }
+                "wait_for" -> waitFor(j.optJSONObject("condition") ?: JSONObject())
+                "more" -> { nextOffset = lastObsOffset() + lastShown; Outcome("ok", extra = "more_requested") }
+                "dialog" -> { acceptNextDialog = j.optBoolean("accept", false); Outcome("ok", extra = "dialog_policy=" + (if (acceptNextDialog) "accept" else "dismiss")) }
+                "tap_xy" -> tapFraction(j.optDouble("x").toFloat(), j.optDouble("y").toFloat())
+                "upload" -> doUpload(j)
+                "upload_file" -> doUploadFile(j)
+                "type_secret" -> typeSecret(a)
+                "capture_secret" -> captureSecret(a)
+                else -> doPageAction(a)
+            }
+        } catch (e: kotlinx.coroutines.CancellationException) { throw e
+        } catch (e: Exception) { Outcome("error", detail = (e.message ?: "exception").take(80)) }
+    }
+
+    /** ভল্ট থেকে মান নিয়ে ফিল্ডে বসায়। AI শুধু "শিরোনাম/ফিল্ড" দিয়েছে — মান এখানেই থাকে, ফলে/ইতিহাসে ফেরে না। */
+    private suspend fun typeSecret(a: AgentAction): Outcome {
+        val j = a.json
+        var title = j.optString("title").trim(); var label = j.optString("field").trim()
+        if (title.isEmpty() || label.isEmpty()) {
+            val ref = j.optString("secret"); val i = ref.indexOf('/')
+            if (i > 0) { title = ref.substring(0, i).trim(); label = ref.substring(i + 1).trim() }
+        }
+        if (title.isEmpty() || label.isEmpty() || a.id == null) return Outcome("error", detail = "secret_ref_invalid")
+        var value: String? = SecretVault.get(host.context, title, label)
+            ?: return Outcome("not_found", detail = "secret_not_in_vault:" + SecretVault.refText(title, label) + " — ask the user for it with need_secret")
+        lastError = null; navStarted = false
+        js(actJs + "\nwindow.__lp.begin();")
+        val req = JSONObject().put("type", "type_secret").put("id", a.id).put("text", value)
+        value = null
+        val res = parseRunResult(js("window.__lp.run(" + req.toString() + ")") ?: "")
+        val result = res.optString("result", "error")
+        if (result != "ok") return Outcome(result, detail = res.optString("detail"))
+        delay(60); awaitSettle(600)
+        return Outcome("ok", extra = "secret_filled(" + SecretVault.refText(title, label) + ")")
+    }
+
+    /**
+     * capture_secret: অনুমোদন কার্ড → অনুমোদন পেলে অ্যাপ নিজে ক্লিপবোর্ড/নির্বাচিত লেখা পড়ে ভল্টে রাখে।
+     * AI কখনো মান পায় না — শুধু সফল/ব্যর্থ ফ্ল্যাগ।
+     */
+    private suspend fun captureSecret(a: AgentAction): Outcome {
+        val j = a.json
+        val title = j.optString("title").trim().take(40)
+        val label = j.optString("field").trim().ifEmpty { "value" }.take(40)
+        if (title.isEmpty()) return Outcome("error", detail = "capture_title_missing")
+        host.setStatus("অনুমোদনের অপেক্ষা: গোপন তথ্য সংরক্ষণ")
+        val d = PermissionGate.request(
+            Risk.HIGH,
+            "গোপন তথ্য ভল্টে নেওয়া",
+            "ELORA ক্লিপবোর্ড বা নির্বাচিত লেখা থেকে একটি গোপন মান '" + title + "/" + label + "' নামে এনক্রিপ্ট করে সংরক্ষণ করতে চায়। AI মানটি দেখতে পাবে না।",
+            120
+        )
+        if (d != Decision.APPROVED) return Outcome("error", detail = "capture_not_approved")
+        // Android 10+ এ ক্লিপবোর্ড পড়া যায় শুধু অ্যাপ ফোকাসে থাকলে (নোটিফিকেশনে অনুমোদন দিলে অ্যাপ পেছনে থাকে)
+        var waited = 0
+        while (!PermissionGate.isForeground() && waited < 40) {
+            if (waited == 0) host.setStatus("অনুমোদিত — গোপন তথ্য নিতে অ্যাপে ফিরে আসুন")
+            delay(500); waited++
+        }
+        var selected: String? = null
+        try {
+            val raw = js("(function(){try{return String(window.getSelection?window.getSelection().toString():'')}catch(e){return ''}})()")
+            selected = (org.json.JSONTokener(raw ?: "null").nextValue() as? String)
+        } catch (e: Exception) { }
+        val st = SecretCapture.captureAfterApproval(host.context, title, label, selected)
+        selected = null
+        return when (st) {
+            SecretCapture.Status.OK -> Outcome("ok", extra = "secret_captured(" + SecretVault.refText(title, label) + ")")
+            SecretCapture.Status.EMPTY -> Outcome("error", detail = "capture_nothing_found — ক্লিপবোর্ড খালি ও কিছু নির্বাচিত নেই")
+            SecretCapture.Status.SAVE_FAILED -> Outcome("error", detail = "capture_save_failed")
+        }
+    }
+
+    private fun lastObsOffset(): Int = lastObs?.offset ?: 0
+
+    private suspend fun waitFor(cond: JSONObject): Outcome {
+        val ms = cond.optLong("ms", 1500).coerceIn(100, 8000)
+        js(actJs + "\nwindow.__lp.begin();")
+        val t0 = SystemClock.uptimeMillis()
+        while (SystemClock.uptimeMillis() - t0 < ms) {
+            val r = unwrap(js("window.__lp.check(" + cond.toString() + ")"))
+            if (r.contains("\"ok\":true")) return Outcome("ok", extra = "condition_met")
+            delay(80)
+        }
+        return Outcome("no_effect", detail = "condition_timeout")
+    }
+
+    private suspend fun doPageAction(a: AgentAction): Outcome {
+        val j = a.json
+        val needEffect = a.type == "click" || a.type == "press" || a.type == "select"
+        val before = web.url.orEmpty()
+        lastError = null; navStarted = false
+        // সেশন ৩: type-এর টেক্সটে {{vault:Title.field}} থাকলে শেষ মুহূর্তে এখানেই রিজলভ — মূল j (ইতিহাস/লগ) অপরিবর্তিত
+        var runJson = j
+        if (a.type == "type") {
+            val (rj, missingRef) = VaultRefs.resolveJsonField(host.context, j, "text")
+            if (missingRef != null) return Outcome("not_found", detail = "secret_not_in_vault:" + missingRef + " — ask the user for it with need_secret")
+            runJson = rj
+        }
+        js(actJs + "\nwindow.__lp.begin();")
+        val res = parseRunResult(js("window.__lp.run(" + runJson.toString() + ")") ?: "")
+        runJson = j
+        val result = res.optString("result", "error")
+        if (result != "ok") return Outcome(result, detail = res.optString("detail"), extra = (resExtra(res) + " " + drainEvents()).trim())
+
+        // trusted কী-ইভেন্ট (Enter ফর্ম-সাবমিট না হলে, এবং অন্য সব কী)
+        val tk = res.optString("trusted_key", "")
+        if (tk.isNotEmpty()) { web.requestFocus(); sendKey(tk); }
+
+        if (res.optBoolean("upload_requested", false)) return Outcome("ok", extra = "upload_clicked")
+
+        // নেভিগেশন শুরু হলে সেটা শেষ হওয়া পর্যন্ত; নইলে DOM শান্ত হওয়া পর্যন্ত
+        delay(60)
+        if (navStarted) { waitForNavigation() } else awaitSettle()
+        var out = readOutcome(needEffect, res, before)
+
+        // no_effect → trusted ট্যাপে একবার ফলব্যাক (Android MotionEvent)
+        if (a.type == "click" && out.result == "no_effect" && a.id != null) {
+            js(actJs + "\nwindow.__lp.begin();")
+            val tapped = tapElement(a.id!!)
+            if (tapped) {
+                delay(60); if (navStarted) waitForNavigation() else awaitSettle()
+                out = readOutcome(true, res, before)
+                if (out.result == "no_effect") out = out.copy(extra = (out.extra + " tapped_trusted").trim())
+                else out = out.copy(extra = (out.extra + " via_trusted_tap").trim())
+            }
+        }
+        return out
+    }
+
+    private suspend fun readOutcome(needEffect: Boolean, res: JSONObject, before: String): Outcome {
+        val now = web.url.orEmpty()
+        val raw = unwrap(js("(window.__lp && window.__lp.outcome) ? window.__lp.outcome(" + needEffect + ") : ''"))
+        val ev = drainEvents()
+        val err = lastError; lastError = null
+        if (raw.isEmpty()) {            // পেজ বদলে গেছে — JS কনটেক্সট নেই
+            val flags = urlChangeFlags(before, now)
+            return if (err != null) Outcome("error", flags, detail = err, extra = ev) else Outcome("ok", flags, extra = ev)
+        }
+        val o = JSONObject(raw)
+        val flags = ArrayList<String>()
+        o.optJSONArray("flags")?.let { for (i in 0 until it.length()) flags.add(it.optString(i)) }
+        if (flags.none { it.startsWith("url_changed") }) flags.addAll(urlChangeFlags(before, now))
+        if (ev.contains("dialog(")) { /* ডায়ালগ নিজেই তথ্য */ }
+        var result = o.optString("result", "ok")
+        if (ev.isNotBlank() && result == "no_effect") result = "ok"     // ডায়ালগ এলে "কিছুই হয়নি" নয়
+        if (err != null) result = "error"
+        val valueStr = res.optString("value", "").ifBlank { null }
+        val read = res.optString("read", "").ifBlank { null }
+        val detail = if (err != null) err else res.optString("detail", "")
+        return Outcome(result, flags, detail = detail, value = valueStr, read = read, extra = (resExtra(res) + " " + ev).trim())
+    }
+
+    // ---- trusted ইনপুট (Android) ----
+    private fun keyCode(k: String): Int = when (k) {
+        "Enter" -> KeyEvent.KEYCODE_ENTER; "Tab" -> KeyEvent.KEYCODE_TAB; "Escape" -> KeyEvent.KEYCODE_ESCAPE
+        "ArrowDown" -> KeyEvent.KEYCODE_DPAD_DOWN; "ArrowUp" -> KeyEvent.KEYCODE_DPAD_UP
+        "ArrowLeft" -> KeyEvent.KEYCODE_DPAD_LEFT; "ArrowRight" -> KeyEvent.KEYCODE_DPAD_RIGHT
+        "Backspace" -> KeyEvent.KEYCODE_DEL; "Delete" -> KeyEvent.KEYCODE_FORWARD_DEL; "Space" -> KeyEvent.KEYCODE_SPACE
+        "PageDown" -> KeyEvent.KEYCODE_PAGE_DOWN; "PageUp" -> KeyEvent.KEYCODE_PAGE_UP
+        "Home" -> KeyEvent.KEYCODE_MOVE_HOME; "End" -> KeyEvent.KEYCODE_MOVE_END
+        else -> KeyEvent.KEYCODE_UNKNOWN
+    }
+
+    private fun sendKey(k: String) {
+        val code = keyCode(k)
+        if (code == KeyEvent.KEYCODE_UNKNOWN) return
+        val t = SystemClock.uptimeMillis()
+        web.dispatchKeyEvent(KeyEvent(t, t, KeyEvent.ACTION_DOWN, code, 0))
+        web.dispatchKeyEvent(KeyEvent(t, SystemClock.uptimeMillis(), KeyEvent.ACTION_UP, code, 0))
+    }
+
+    private suspend fun tapViewPx(x: Float, y: Float) {
+        val t = SystemClock.uptimeMillis()
+        val down = MotionEvent.obtain(t, t, MotionEvent.ACTION_DOWN, x, y, 0)
+        web.dispatchTouchEvent(down); down.recycle()
+        delay(50)
+        val up = MotionEvent.obtain(t, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, x, y, 0)
+        web.dispatchTouchEvent(up); up.recycle()
+    }
+
+    private suspend fun tapElement(id: String): Boolean {
+        val r = try { JSONObject(unwrap(js("window.__lp.rectOf(" + JSONObject.quote(id) + ")"))) } catch (e: Exception) { return false }
+        if (r.optString("result") != "ok") return false
+        val iw = r.optDouble("iw", 0.0); val ih = r.optDouble("ih", 0.0)
+        if (iw <= 0 || ih <= 0) return false
+        tapViewPx((r.optDouble("cx") / iw * web.width).toFloat(), (r.optDouble("cy") / ih * web.height).toFloat())
+        return true
+    }
+
+    private suspend fun tapFraction(fx: Float, fy: Float): Outcome {
+        val before = web.url.orEmpty()
+        js(actJs + "\nwindow.__lp.begin();")
+        tapViewPx(fx.coerceIn(0f, 1f) * web.width, fy.coerceIn(0f, 1f) * web.height)
+        delay(60); if (navStarted) waitForNavigation() else awaitSettle()
+        return readOutcome(true, JSONObject(), before)
+    }
+
+    /**
+     * Tools মোড: Storage-এর ফাইল নাম/পাথ দিয়ে বেছে আপলোড। [toolsFileResolver] সেট না থাকলে (সাধারণ ব্রাউজার) ত্রুটি।
+     * আসল কাজ বিদ্যমান [doUpload]-এ — শুধু file_ref-এ আগে থেকে Uri বসানো হয়, তাই চুজার ইউজারকে জিজ্ঞেস করে না।
+     */
+    var toolsFileResolver: ((String) -> Uri?)? = null
+
+    private suspend fun doUploadFile(j: JSONObject): Outcome {
+        val name = j.optString("file").trim().ifEmpty { j.optString("path").trim() }
+        if (name.isEmpty()) return Outcome("error", detail = "upload_file_name_missing")
+        val resolver = toolsFileResolver ?: return Outcome("error", detail = "upload_file_not_available")
+        val uri = resolver(name) ?: return Outcome("not_found", detail = "storage_file_not_found:" + name.take(60))
+        val ref = "tools:" + name.take(80)
+        fileRefs[ref] = uri
+        val j2 = JSONObject(j.toString()).put("type", "upload").put("file_ref", ref)
+        return doUpload(j2)
+    }
+
+    // ---- Tools মোডের ওয়ার্কস্পেস-সেতু (লুপ ছাড়া সরাসরি ব্যবহার; main thread থেকে ডাকতে হবে) ----
+    suspend fun externalAct(a: AgentAction): Outcome = executeAction(a)
+
+    /** একটাই ভালো পর্যবেক্ষণ (lp_observe.js + budget-ছাঁটাই)। শেষ পর্যবেক্ষণ "more"-এর জন্য মনে রাখে। */
+    suspend fun externalObserve(budgetTokens: Int): Observation? {
+        if (navStarted) waitForNavigation()
+        val o = observe(budget = budgetTokens.coerceIn(300, 3000)) ?: return null
+        lastObs = o
+        lastShown = o.shown
+        return o
+    }
+
+    private suspend fun doUpload(j: JSONObject): Outcome {
+        currentUploadRef = j.optString("file_ref", "file").ifBlank { "file" }
+        fileDeferred = CompletableDeferred()
+        val res = parseRunResult(js(actJs + "\nwindow.__lp.begin();window.__lp.run(" + j.toString() + ")") ?: "")
+        if (res.optString("result") != "ok") return Outcome(res.optString("result", "error"), detail = res.optString("detail"))
+        val r = withTimeoutOrNull(180_000) { fileDeferred?.await() } ?: "timeout"
+        fileDeferred = null
+        awaitSettle()
+        return if (r == "cancelled" || r == "timeout") Outcome("no_effect", detail = "upload_$r") else Outcome("ok", extra = "upload=$r")
+    }
+
+    // =================================================================== স্ক্রিনশট (ডাউনস্কেল)
+    private fun captureScreenshotRaw(): String? = try {
+        val w = web.width; val h = web.height
+        if (w <= 0 || h <= 0) null else {
+            val full = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+            web.draw(Canvas(full))
+            val scale = 768f / maxOf(w, h).toFloat()
+            val bmp = if (scale < 1f) Bitmap.createScaledBitmap(full, (w * scale).toInt().coerceAtLeast(1), (h * scale).toInt().coerceAtLeast(1), true) else full
+            val out = ByteArrayOutputStream()
+            bmp.compress(Bitmap.CompressFormat.JPEG, 60, out)
+            Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP)
+        }
+    } catch (e: Exception) { null }
+
+    /** ছবি AI-কে যাওয়ার আগে ভল্ট-পূরণ/পাসওয়ার্ড ফিল্ড ঢাকা (ইউজারনেম/ইমেইলও ছবিতে দেখা যাবে না)। */
+    private suspend fun captureScreenshot(): String? {
+        try { js(actJs + "\nwindow.__lp.maskSecrets(true);"); delay(90) } catch (e: Exception) { }
+        try {
+            return captureScreenshotRaw()
+        } finally {
+            kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) {
+                try { js("(window.__lp && window.__lp.maskSecrets) ? window.__lp.maskSecrets(false) : ''") } catch (e: Exception) { }
+            }
+        }
+    }
+
+    private fun persist() {
+        try { AgentStateStore.save(host.context, runId, goal, system, plan, ledger, history, perms, lastObs?.url ?: web.url.orEmpty(), userNotes, searched) } catch (e: Exception) { }
+    }
+}

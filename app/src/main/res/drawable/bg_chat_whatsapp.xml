@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v50: লার্নিং মোডের চ্যাট পেজের ব্যাকগ্রাউন্ড — WhatsApp-এর মতো হালকা বেইজ + doodle প্যাটার্ন (শুধু ব্যাকগ্রাউন্ড; মেসেজ Claude-স্টাইল) -->
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+    android:src="@drawable/bg_chat_doodle_tile"
+    android:tileMode="repeat"
+    android:dither="true" />

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- সিস্টেম ও এআই-এর নাম — এক জায়গা থেকেই বদলানো যাবে -->
+    <string name="elora_name" translatable="false">ELORA</string>
+
+    <string name="tools_greeting_morning">সুপ্রভাত</string>
+    <string name="tools_greeting_noon">শুভ দুপুর</string>
+    <string name="tools_greeting_afternoon">শুভ বিকাল</string>
+    <string name="tools_greeting_evening">শুভ সন্ধ্যা</string>
+    <string name="tools_greeting_night">শুভ রাত্রি</string>
+    <string name="tools_greeting_format">%1$s! আজ কী কাজ করে দেব?</string>
+
+    <string name="tools_opt_browser">ব্রাউজার</string>
+    <string name="tools_opt_shell">শেল</string>
+    <string name="tools_opt_storage">স্টোরেজ</string>
+    <string name="tools_sessions">সেশন</string>
+    <string name="tools_close">বন্ধ করুন</string>
+    <string name="tools_send">পাঠান</string>
+    <string name="tools_input_hint">কাজের লক্ষ্য লিখুন…</string>
+    <string name="tools_soon">পরের ধাপে আসছে</string>
+    <string name="tools_status_planning">%1$s: পরিকল্পনার অংশ পরের ধাপে আসছে — কাজটি আপাতত সেশনে সংরক্ষিত হয়েছে।</string>
+    <string name="tools_note_saved">লক্ষ্য সংরক্ষিত — পরিকল্পনা পরের ধাপে</string>
+    <string name="tools_session_default_title">নতুন কাজ</string>
+    <string name="tools_session_create_failed">সেশন তৈরি করা যায়নি: %1$s</string>
+
+    <string name="tools_state_idle">নিষ্ক্রিয়</string>
+    <string name="tools_state_running">চলছে</string>
+    <string name="tools_state_waiting">অপেক্ষায়</string>
+    <string name="tools_state_needs_you">আপনার দরকার</string>
+    <string name="tools_state_done">শেষ</string>
+    <string name="tools_state_failed">ব্যর্থ</string>
+
+    <string name="tools_sessions_title">কাজের সেশন</string>
+    <string name="tools_sessions_empty">এখনো কোনো সেশন নেই।</string>
+    <string name="tools_session_delete_title">সেশন মুছবেন?</string>
+    <string name="tools_session_delete_msg">\"%1$s\" এবং এর সব ফাইল মুছে যাবে।</string>
+
+    <string name="tools_storage_title">স্টোরেজ</string>
+    <string name="tools_storage_root">স্টোরেজ</string>
+    <string name="tools_storage_empty">এখানে কিছু নেই। উপরের আপলোড বাটনে ফাইল যোগ করুন।</string>
+    <string name="tools_storage_search_hint">নাম দিয়ে খুঁজুন…</string>
+    <string name="tools_storage_search_empty">কিছু পাওয়া যায়নি।</string>
+    <string name="tools_upload">ফাইল আপলোড</string>
+    <string name="tools_search">খুঁজুন</string>
+    <string name="tools_new_folder">নতুন ফোল্ডার</string>
+    <string name="tools_back">পিছনে</string>
+    <string name="tools_upload_result">আপলোড: %1$d টি সফল, %2$d টি ব্যর্থ</string>
+    <string name="tools_act_download">ফোনে ডাউনলোড করুন</string>
+    <string name="tools_act_share">শেয়ার করুন</string>
+    <string name="tools_act_rename">নাম বদলান</string>
+    <string name="tools_act_delete">মুছুন</string>
+    <string name="tools_act_extract">এখানে এক্সট্র্যাক্ট করুন</string>
+    <string name="tools_act_zip">ZIP বানান</string>
+    <string name="tools_downloaded">ডাউনলোডে সংরক্ষিত: %1$s</string>
+    <string name="tools_extracted">%1$d টি আইটেম এক্সট্র্যাক্ট হয়েছে</string>
+    <string name="tools_zipped">ZIP তৈরি: %1$s</string>
+    <string name="tools_delete_title">মুছবেন?</string>
+    <string name="tools_delete_msg">\"%1$s\" স্থায়ীভাবে মুছে যাবে।</string>
+    <string name="tools_rename_title">নাম বদলান</string>
+    <string name="tools_new_folder_title">নতুন ফোল্ডার</string>
+    <string name="tools_folder_name_hint">ফোল্ডারের নাম</string>
+    <string name="tools_ok">ঠিক আছে</string>
+    <string name="tools_cancel">বাতিল</string>
+    <string name="tools_close_preview">বন্ধ</string>
+    <string name="tools_no_preview">এই ফাইলের প্রিভিউ নেই</string>
+    <string name="tools_preview_truncated">\n\n… (বাকি অংশ দেখানো হয়নি)</string>
+    <string name="tools_share_chooser">ফাইল শেয়ার করুন</string>
+    <string name="tools_err_generic">কাজটি করা যায়নি: %1$s</string>
+</resources>

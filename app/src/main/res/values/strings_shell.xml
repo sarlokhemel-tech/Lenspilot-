@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shell_title">lenspilot শেল</string>
+    <string name="shell_github">GitHub</string>
+    <string name="shell_close">✕</string>
+    <string name="shell_hint">কমান্ড লিখুন (যেমন git status)</string>
+    <string name="shell_hint_busy">চলছে…</string>
+    <string name="shell_hint_ai">ELORA কাজ করছে…</string>
+    <string name="shell_ai_working">ELORA কাজ করছে — ইনপুট লক করা আছে</string>
+    <string name="shell_busy">আগের কমান্ড এখনো চলছে — Stop চাপুন বা অপেক্ষা করুন</string>
+    <string name="shell_bad_session">অবৈধ সেশন</string>
+    <string name="shell_welcome">lenspilot শেল — Git (JGit 5.13) ও নেভিগেশন। সাহায্যের জন্য: help</string>
+    <string name="shell_btn_up">▲</string>
+    <string name="shell_btn_down">▼</string>
+    <string name="shell_btn_stop">■</string>
+
+    <string name="shell_gh_title">GitHub লগইন</string>
+    <string name="shell_gh_starting">কোড তৈরি হচ্ছে…</string>
+    <string name="shell_gh_instructions">নিচের কোডটি GitHub-এর পেজে বসান, তারপর Authorize করুন।</string>
+    <string name="shell_gh_open">GitHub খুলুন (কোড কপি হবে)</string>
+    <string name="shell_gh_waiting">আপনার অনুমোদনের অপেক্ষা…</string>
+    <string name="shell_gh_ok">লগইন সফল ✓</string>
+    <string name="shell_gh_expired">কোডের মেয়াদ শেষ — আবার চেষ্টা করুন।</string>
+    <string name="shell_gh_denied">আপনি অনুমতি দেননি।</string>
+    <string name="shell_gh_network">নেটওয়ার্ক সমস্যা — ইন্টারনেট দেখে আবার চেষ্টা করুন।</string>
+    <string name="shell_gh_save_failed">টোকেন নিরাপদে সংরক্ষণ করা যায়নি।</string>
+    <string name="shell_gh_no_client_id">github_oauth_client_id সেট করা নেই (res/values/strings.xml-এ বসান)।</string>
+    <string name="shell_gh_flow_disabled">GitHub OAuth App-এ \"Enable Device Flow\" চালু করুন।</string>
+    <string name="shell_gh_logged_in">GitHub-এ লগইন করা আছে।</string>
+    <string name="shell_gh_logout">লগআউট</string>
+    <string name="shell_gh_logged_out">লগআউট হয়েছে।</string>
+    <string name="shell_gh_code_copied">কোড কপি হয়েছে</string>
+    <string name="shell_gh_cancel">বাতিল</string>
+    <string name="shell_gh_close">বন্ধ</string>
+</resources>
