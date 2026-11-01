@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shell_title">lenspilot Shell</string>
+    <string name="shell_github">GitHub</string>
+    <string name="shell_close">✕</string>
+    <string name="shell_hint">Enter a command (e.g. git status)</string>
+    <string name="shell_hint_busy">Running…</string>
+    <string name="shell_hint_ai">ELORA is working…</string>
+    <string name="shell_ai_working">ELORA is working — input locked</string>
+    <string name="shell_busy">Previous command is still running — press Stop or wait</string>
+    <string name="shell_bad_session">Invalid session</string>
+    <string name="shell_welcome">lenspilot Shell — Git (JGit 5.13) and navigation. For help: help</string>
+    <string name="shell_btn_up">▲</string>
+    <string name="shell_btn_down">▼</string>
+    <string name="shell_btn_stop">■</string>
+
+    <string name="shell_gh_title">GitHub Login</string>
+    <string name="shell_gh_starting">Generating code…</string>
+    <string name="shell_gh_instructions">Enter the code below on the GitHub page, then tap Authorize.</string>
+    <string name="shell_gh_open">Open GitHub (code will be copied)</string>
+    <string name="shell_gh_waiting">Waiting for your approval…</string>
+    <string name="shell_gh_ok">Login successful ✓</string>
+    <string name="shell_gh_expired">Code expired — try again.</string>
+    <string name="shell_gh_denied">You did not grant permission.</string>
+    <string name="shell_gh_network">Network problem — check your internet and try again.</string>
+    <string name="shell_gh_save_failed">Couldn\'t save the token securely.</string>
+    <string name="shell_gh_no_client_id">github_oauth_client_id is not set (add it in res/values/strings.xml).</string>
+    <string name="shell_gh_flow_disabled">Enable \"Enable Device Flow\" in your GitHub OAuth App.</string>
+    <string name="shell_gh_logged_in">Logged in to GitHub.</string>
+    <string name="shell_gh_logout">Log out</string>
+    <string name="shell_gh_logged_out">Logged out.</string>
+    <string name="shell_gh_code_copied">Code copied</string>
+    <string name="shell_gh_cancel">Cancel</string>
+    <string name="shell_gh_close">Close</string>
+</resources>
