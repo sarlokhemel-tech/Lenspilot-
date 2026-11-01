@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="8dp">
+
+        <TextView
+            android:id="@+id/shellTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="monospace"
+            android:text="@string/shell_title"
+            android:textColor="#5AF78E"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/shellGithub"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:background="@drawable/bg_shell_btn"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:minWidth="64dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="@string/shell_github"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/shellClose"
+            android:layout_width="40dp"
+            android:layout_height="34dp"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/bg_shell_btn"
+            android:gravity="center"
+            android:text="@string/shell_close"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/shellAiBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#7A4F00"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="@string/shell_ai_working"
+        android:textColor="#FFE9B0"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <ScrollView
+        android:id="@+id/shellScroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:scrollbars="vertical">
+
+        <TextView
+            android:id="@+id/shellOutput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:paddingStart="8dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="4dp"
+            android:textColor="#D4D4D4"
+            android:textIsSelectable="true"
+            android:textSize="12sp" />
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/shellProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="monospace"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:singleLine="true"
+        android:textColor="#8BE9FD"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/shellPrompt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="start"
+        android:fontFamily="monospace"
+        android:paddingStart="8dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="8dp"
+        android:singleLine="true"
+        android:textColor="#5AF78E"
+        android:textSize="12sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="6dp"
+        android:paddingBottom="6dp">
+
+        <EditText
+            android:id="@+id/shellInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@null"
+            android:fontFamily="monospace"
+            android:hint="@string/shell_hint"
+            android:imeOptions="actionGo|flagNoExtractUi"
+            android:inputType="text|textNoSuggestions"
+            android:maxLines="1"
+            android:minHeight="40dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#666666"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/shellUp"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_shell_btn"
+            android:gravity="center"
+            android:text="@string/shell_btn_up"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/shellDown"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/bg_shell_btn"
+            android:gravity="center"
+            android:text="@string/shell_btn_down"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/shellStop"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/bg_shell_btn"
+            android:gravity="center"
+            android:text="@string/shell_btn_stop"
+            android:textColor="#FF6B6B" />
+    </LinearLayout>
+</LinearLayout>
