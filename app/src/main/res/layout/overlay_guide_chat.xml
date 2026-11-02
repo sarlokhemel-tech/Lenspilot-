@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v81: বাবলের চ্যাট এখন মেইন চ্যাটের হুবহু চেহারা — একই হালকা কম্পোজার (bg_input_field), একই গোল বাটন/+/সেন্ড আইকন,
+     একই মডেল/মোড চিপ। শুধু ওপরের ডান কোনায় "স্ক্রিন দেখা" (👁) অন/অফ বাটন বাড়তি। মডেল/মোড/+ তালিকা ModePickerSheet.buildSheet-এর
+     একই সাদা শিট (পিকআপ-বক্সে বসে)। পেছনের স্ক্রিন স্বচ্ছ — উইন্ডো শুধু কন্টেন্টের সমান উঁচু, তাই বাকি স্ক্রিন ছোঁয়া যায়।
+     দেখো GuideChatOverlay। -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/guideChatRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+<LinearLayout
+    android:id="@+id/guideChatPanel"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:clickable="true"
+    android:orientation="vertical"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="12dp">
+
+    <!-- v87: হেডার = মেইন চ্যাটের টপ বারের গ্লাস রূপ — GuideChatOverlay এখানে GlassMain.topBar বসায়:
+         বাঁয়ে সাইডবার, তার পাশে 👁 স্ক্রিন-দেখা, ডানে ✕ -->
+    <FrameLayout
+        android:id="@+id/guideChatTopHolder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.hemel.lenspilot.chat.MaxHeightScrollView
+        android:id="@+id/guideChatScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:scrollbars="none"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:id="@+id/guideChatList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="8dp" />
+    </com.hemel.lenspilot.chat.MaxHeightScrollView>
+
+    <!-- সংযুক্তির প্রিভিউ (ছবি / ভিডিও-শিট / ফাইল) + নাম -->
+    <LinearLayout
+        android:id="@+id/guideChatPreviewRow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_live_glass_input"
+        android:padding="6dp"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:layout_width="56dp"
+            android:layout_height="56dp">
+
+            <ImageView
+                android:id="@+id/guideChatPreview"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_bubble_ai" />
+
+            <ImageButton
+                android:id="@+id/guideChatPreviewRemove"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="top|end"
+                android:background="@drawable/bg_circle_icon_active"
+                android:padding="4dp"
+                android:src="@drawable/ic_close_white"
+                android:contentDescription="Remove attachment" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/guideChatPreviewLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="6dp"
+            android:maxWidth="200dp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- মডেল/মোড/"+" তালিকা — মেইন চ্যাটের একই সাদা শিট এখানে বসে (GuideChatOverlay.showSheet) -->
+    <FrameLayout
+        android:id="@+id/guideChatPick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:visibility="gone" />
+
+    <!-- মেইন চ্যাটের কম্পোজার: ওপরে লেখার ঘর; নিচের সারিতে [+] [মডেল ▾] [মোড ▾] ········ [সেন্ড] -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_live_glass_input"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <EditText
+            android:id="@+id/guideChatInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginTop="4dp"
+            android:minHeight="40dp"
+            android:background="@android:color/transparent"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:gravity="center_vertical"
+            android:hint="@string/chat_input_hint"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#B3FFFFFF"
+            android:textSize="15sp"
+            android:maxLines="5"
+            android:imeOptions="actionSend"
+            android:inputType="textMultiLine|textCapSentences" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:paddingTop="2dp">
+
+            <ImageButton
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:id="@+id/guideChatAttach"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_live_glass_circle"
+                android:tint="#FFFFFF"
+                android:padding="8dp"
+                android:src="@drawable/ic_add"
+                android:contentDescription="Attach a photo, video or file" />
+
+            <HorizontalScrollView
+                app:layout_constraintStart_toEndOf="@id/guideChatAttach"
+                app:layout_constraintEnd_toStartOf="@id/guideChatSend"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:layout_marginStart="6dp"
+                android:overScrollMode="never"
+                android:scrollbars="none">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/guideChatModelChip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:background="@drawable/bg_live_glass_chip"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:text="Super 1.2 ▾"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Choose model" />
+                    <TextView
+                        android:id="@+id/guideChatModeChip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/bg_live_glass_chip"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:text="Screen Guide ▾"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Choose mode" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <ImageButton
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:id="@+id/guideChatSend"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_live_glass_circle_active"
+                android:tint="#FFFFFF"
+                android:padding="9dp"
+                android:src="@drawable/ic_send"
+                android:contentDescription="@string/chat_send" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</LinearLayout>
+</FrameLayout>

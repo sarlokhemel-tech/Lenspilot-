@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- সেশন ৭: ToolsAgent / লাইভ স্ক্রিন / হোম-পরিকল্পনা -->
+    <string name="tools_err_tokens">Out of tokens — recharge and try again</string>
+    <string name="tools_err_rate">Too many requests — try again shortly</string>
+    <string name="tools_err_login">Login required — sign in to the app again</string>
+    <string name="tools_err_server">Server error (%1$d)</string>
+    <string name="tools_err_network">Couldn\'t reach the internet/server</string>
+    <string name="tools_err_no_plan">No plan found — try again</string>
+
+    <string name="tools_agent_thinking">Thinking…</string>
+    <string name="tools_agent_limit">Task limit (steps/decisions) exceeded — stopped</string>
+    <string name="tools_agent_offline_plan">Server unreachable; following the plan.</string>
+    <string name="tools_agent_decide_failed">Couldn\'t decide the next step: %1$s</string>
+    <string name="tools_agent_failed_generic">Couldn\'t finish the task</string>
+    <string name="tools_agent_need_help">Your help is needed</string>
+    <string name="tools_agent_no_idea">I\'m not sure what to do — please give some direction</string>
+    <string name="tools_agent_goal_edited">Clarified the goal: %1$s</string>
+    <string name="tools_agent_waiting_approval">Waiting for your approval</string>
+    <string name="tools_agent_denied">Approval not granted: %1$s</string>
+    <string name="tools_agent_step_failed">%1$s failed: %2$s. What should I do?</string>
+    <string name="tools_agent_retries_over">%1$s failed after three attempts (%2$s). What should I do?</string>
+    <string name="tools_agent_stuck_ask">The same problem keeps happening (%1$s). What should I do?</string>
+    <string name="tools_agent_stuck_change">Same error twice — changing approach.</string>
+    <string name="tools_agent_waiting_detector">Waiting for completion: %1$s</string>
+    <string name="tools_agent_waiting_short">Waiting (no tokens used)</string>
+    <string name="tools_agent_detector_timeout">%1$s: didn\'t finish in the allotted time</string>
+    <string name="tools_agent_wait_until_note">Waiting for the scheduled time</string>
+    <string name="tools_agent_sleeping">Waiting %1$d seconds</string>
+    <string name="tools_agent_waiting_until">Waiting — until %1$s</string>
+    <string name="tools_agent_wait_over">Time\'s up, resuming.</string>
+    <string name="tools_agent_needs_you_title">Needs you</string>
+    <string name="tools_agent_paused">Paused</string>
+    <string name="tools_agent_user_stopped">Stopped by user</string>
+    <string name="tools_agent_done">Task completed</string>
+    <string name="tools_agent_done_title">Task done</string>
+    <string name="tools_agent_failed_title">Task failed</string>
+
+    <string name="tools_ask_retry">Retry</string>
+    <string name="tools_ask_skip">Skip</string>
+    <string name="tools_ask_stop">Stop</string>
+    <string name="tools_ask_done">Done</string>
+
+    <string name="tools_live_bad_session">Couldn\'t open session</string>
+    <string name="tools_live_browser_idle">Nothing in the browser yet.</string>
+    <string name="tools_live_chat_hint">Tell ELORA something…</string>
+    <string name="tools_live_open_browser">Open Browser</string>
+    <string name="tools_live_open_storage">Open Storage</string>
+    <string name="tools_live_storage_empty">Folder is empty so far.</string>
+    <string name="tools_shell_ai_banner">ELORA is working — input locked</string>
+
+    <!-- হোম: পরিকল্পনার স্টেজ ও কার্ড -->
+    <string name="tools_plan_stage_constraints">Understanding constraints…</string>
+    <string name="tools_plan_stage_criteria">Deciding evaluation criteria…</string>
+    <string name="tools_plan_stage_candidates">Listing different approaches…</string>
+    <string name="tools_plan_stage_research">Researching each approach…</string>
+    <string name="tools_plan_stage_scoring">Scoring based on evidence…</string>
+    <string name="tools_plan_stage_critic">Reviewing with a critical eye…</string>
+    <string name="tools_plan_stage_final">Preparing the final plan…</string>
+    <string name="tools_plan_failed">Couldn\'t create a plan: %1$s</string>
+    <string name="tools_plan_card_title">Plan ready</string>
+    <string name="tools_plan_card_steps">%1$d steps</string>
+    <string name="tools_plan_card_time">Estimated time: %1$s</string>
+    <string name="tools_plan_card_cost">Estimated cost: %1$s</string>
+    <string name="tools_plan_start">Start</string>
+    <string name="tools_plan_autostart">Start automatically from now on</string>
+    <string name="tools_plan_busy">ELORA is still planning — please wait.</string>
+    <string name="tools_plan_started">Task started — watch it on the live screen.</string>
+    <string name="tools_plan_warnings">Warning: %1$s</string>
+</resources>
