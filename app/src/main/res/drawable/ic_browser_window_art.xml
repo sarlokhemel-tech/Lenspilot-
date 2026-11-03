@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Hero art for AI Browser mode: a tiny browser window the Lenspilot robot "drives". -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="170dp"
+    android:viewportWidth="240"
+    android:viewportHeight="170">
+    <!-- window body -->
+    <path
+        android:fillColor="#122630"
+        android:strokeColor="#25414D"
+        android:strokeWidth="2"
+        android:pathData="M16,4 H224 A12,12 0 0 1 236,16 V154 A12,12 0 0 1 224,166 H16 A12,12 0 0 1 4,154 V16 A12,12 0 0 1 16,4 Z" />
+    <!-- title bar -->
+    <path
+        android:fillColor="#1A3541"
+        android:pathData="M16,4 H224 A12,12 0 0 1 236,16 V34 H4 V16 A12,12 0 0 1 16,4 Z" />
+    <!-- window dots -->
+    <path android:fillColor="#F87171" android:pathData="M20,19 m-4,0 a4,4 0 1 0 8,0 a4,4 0 1 0 -8,0" />
+    <path android:fillColor="#FBBF24" android:pathData="M34,19 m-4,0 a4,4 0 1 0 8,0 a4,4 0 1 0 -8,0" />
+    <path android:fillColor="#34D399" android:pathData="M48,19 m-4,0 a4,4 0 1 0 8,0 a4,4 0 1 0 -8,0" />
+    <!-- address pill -->
+    <path
+        android:fillColor="#0B2530"
+        android:pathData="M64,12 H216 A7,7 0 0 1 216,26 H64 A7,7 0 0 1 64,12 Z" />
+    <path
+        android:fillColor="#7DD3E0"
+        android:pathData="M74,17 H122 V21 H74 Z" />
+    <!-- page content lines -->
+    <path android:fillColor="#25414D" android:pathData="M20,48 H110 V56 H20 Z" />
+    <path android:fillColor="#1A3541" android:pathData="M20,64 H70 V72 H20 Z" />
+    <path android:fillColor="#1A3541" android:pathData="M20,80 H90 V88 H20 Z" />
+    <path android:fillColor="#7DD3E0" android:fillAlpha="0.85" android:pathData="M150,48 H214 A6,6 0 0 1 220,54 V66 A6,6 0 0 1 214,72 H150 A6,6 0 0 1 144,66 V54 A6,6 0 0 1 150,48 Z" />
+    <!-- cursor -->
+    <path android:fillColor="#E6FBFF" android:strokeColor="#061A22" android:strokeWidth="1.5"
+        android:pathData="M176,60 L176,84 L182,79 L186,88 L190,86 L186,77 L194,77 Z" />
+</vector>

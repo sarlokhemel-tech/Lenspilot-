@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- "আমার তথ্য" — a free-form label/value table the user fills in once
+     (name, address, whatever they want the AI to know) and that gets
+     attached to every request afterwards — see Prefs.userInfoJsonArrayOrNull
+     and app.py's build_user_info_block(). Rows are fully dynamic (add/
+     remove any number) and both columns grow with their content; the
+     label column is narrower (see item_user_info_row.xml's weights). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/user_info_title"
+        android:textColor="@color/text_primary_light"
+        android:textSize="12sp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Column headers, matching item_user_info_row.xml's weights so they
+         line up with the rows below. -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="4dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:text="@string/user_info_header_label"
+            android:textColor="@color/text_secondary_light"
+            android:textStyle="bold"
+            android:textSize="11sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_marginEnd="6dp"
+            android:text="@string/user_info_header_value"
+            android:textColor="@color/text_secondary_light"
+            android:textStyle="bold"
+            android:textSize="11sp" />
+
+        <View android:layout_width="28dp" android:layout_height="1dp" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/userInfoRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:clipToPadding="false" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:id="@+id/userInfoAddRowButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/user_info_add_row"
+            android:textColor="@color/primary_action"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:padding="8dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="start|center_vertical" />
+
+        <ImageButton
+            android:id="@+id/userInfoAddFromImageButton"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_circle_icon"
+            android:padding="7dp"
+            android:src="@drawable/ic_image_add"
+            android:contentDescription="@string/user_info_add_from_image" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/userInfoStatusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="@color/text_secondary_light"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+</LinearLayout>

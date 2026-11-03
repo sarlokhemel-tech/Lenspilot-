@@ -1,0 +1,1360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mainDrawer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/mainRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light">
+
+    <!-- ===================== SIGN-IN SCREEN ===================== -->
+    <LinearLayout
+        android:id="@+id/signInSection"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@drawable/ic_lenspilot_logo"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="@string/signin_prompt"
+            android:textColor="@color/text_primary_light"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/subtitleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/signin_subtitle"
+            android:textColor="@color/text_secondary_light"
+            android:textSize="14sp"
+            android:gravity="center" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/signInButton"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_marginTop="28dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="24dp"
+            android:background="@drawable/bg_button_google"
+            android:text="@string/signin_with_google"
+            android:textColor="#3C4043"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif-medium"
+            android:drawableStart="@drawable/ic_google_logo"
+            android:drawablePadding="12dp"
+            android:elevation="1dp"
+            android:stateListAnimator="@null"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
+    <!-- ===================== CHAT SCREEN ===================== -->
+    <LinearLayout
+        android:id="@+id/chatSection"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Top bar: history | title | new-chat | profile -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp">
+
+            <ImageButton
+                android:id="@+id/historyButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="8dp"
+                android:src="@drawable/ic_history"
+                android:contentDescription="@string/chat_history_title" />
+
+            <!-- Icon-only shortcut for "app খুললেই ভয়েস কমান্ড" — no label,
+                 just a button, right at the top of the app, so it doesn't
+                 need to live inside the Settings dialog anymore. Tapping
+                 toggles the setting AND, when turning it on, jumps
+                 straight into the voice-first ball immediately. -->
+            <ImageButton
+                android:id="@+id/voiceFirstToggleButton"
+                android:visibility="gone"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/historyButton"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="8dp"
+                android:src="@drawable/ic_mic"
+                android:contentDescription="Voice command on app open" />
+
+            <!-- Lenspilot Keyboard mode — opens dialog_keyboard_mode, a
+                 normal system IME toggle, no Accessibility involved. -->
+            <ImageButton
+                android:id="@+id/keyboardModeButton"
+                android:visibility="gone"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/voiceFirstToggleButton"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="8dp"
+                android:src="@drawable/ic_keyboard"
+                android:contentDescription="@string/cd_keyboard_mode_button" />
+
+            <!-- Master OFF: one tap that force-stops every running
+                 process (workflow, overlays, control bar, TTS, mic) even
+                 if a workflow finished but left something stuck on
+                 screen. Replaces the old plain "Lenspilot" title label —
+                 the app name is already shown on the history screen, so
+                 this spot is more useful as an always-available kill
+                 switch. -->
+            <ImageButton
+                android:id="@+id/masterOffButton"
+                android:visibility="gone"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="8dp"
+                android:src="@drawable/ic_power_off"
+                app:tint="@color/danger_destructive"
+                android:contentDescription="@string/cd_master_off" />
+
+            <!-- The old always-on "আমার তথ্য" header button (userInfoButton)
+                 is gone — that sent its saved table with EVERY request,
+                 everywhere, forever. Per-run data now lives as a small
+                 icon next to each individual Run button instead (see
+                 item_workflow_card.xml / item_ela_run_button.xml +
+                 MainActivity.showOneTimeUserInfoDialog), so info only
+                 ever rides along with the one run it was attached to. -->
+            <ImageButton
+                android:id="@+id/speakButton"
+                android:visibility="gone"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/newChatButton"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="7dp"
+                android:src="@drawable/ic_speaker"
+                android:contentDescription="Speak reply" />
+
+            <ImageButton
+                android:id="@+id/newChatButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="8dp"
+                android:src="@drawable/ic_temp_chat"
+                android:contentDescription="Temporary chat" />
+
+            <ImageButton
+                android:id="@+id/profileButton"
+                android:visibility="gone"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="8dp"
+                android:src="@drawable/ic_profile"
+                android:contentDescription="Profile" />
+        </RelativeLayout>
+
+        <!-- v79: Temporary chat চালু থাকলে ছোট নোট (Claude-এর incognito-র মতো) -->
+        <LinearLayout
+            android:id="@+id/tempChatBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingTop="2dp"
+            android:paddingBottom="4dp"
+            android:visibility="gone">
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_temp_chat"
+                android:alpha="0.7" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="Temporary chat · not saved, not used for personalization"
+                android:textColor="@color/text_secondary_light"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- NOTE: the old speak/mic/stop control ROW that used to live
+             here has been removed on purpose — those 3 icons now only
+             ever appear as the floating overlay control bar (see
+             overlay_control_bar.xml), and only while a workflow is
+             actually running on-screen, outside the app. Regular voice
+             dictation for composing a chat message lives in the input
+             row below (micButton) instead, unchanged behavior. -->
+
+        <TextView
+            android:id="@+id/voiceStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/text_secondary_light"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:layout_marginTop="2dp" />
+
+        <!-- Accessibility onboarding banner -->
+        <LinearLayout
+            android:id="@+id/accessibilityCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:padding="12dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_workflow_card"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/workflow_need_accessibility"
+                android:textColor="@color/text_primary_light"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/enableAccessibilityButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_button_secondary"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:text="Enable"
+                android:textAllCaps="false"
+                android:textColor="@color/text_primary_light" />
+        </LinearLayout>
+
+        <!-- v37: উপরের ছোট রোবট + "তুমি বলো…" লেখা সরানো হয়েছে। id রাখা হলো কারণ MainActivity এর দৃশ্যমানতা বদলায়; এটা শূন্য-মাপের লুকানো ভিউ। -->
+        <View
+            android:id="@+id/browserChrome"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+
+        <!-- Chat messages + empty state -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/chatRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp" />
+
+            <TextView
+                android:id="@+id/emptyStateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/chat_empty_state"
+                android:textColor="@color/claude_text"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:background="@drawable/bg_claude_chip"
+                android:paddingStart="26dp"
+                android:paddingEnd="26dp"
+                android:paddingTop="13dp"
+                android:paddingBottom="13dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <!-- v100: Multi Search মোডে "Get an AI agent"-এর জায়গায় এই আইকন — চাপলে কয়টা এজেন্ট (২..৫) সেটা বাছা যায় -->
+            <FrameLayout
+                android:id="@+id/multiAgentPickFab"
+                android:layout_width="84dp"
+                android:layout_height="84dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_claude_chip_round"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone"
+                android:contentDescription="Choose how many AI agents search">
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_multi_agent"
+                    android:importantForAccessibility="no" />
+                <TextView
+                    android:id="@+id/multiAgentPickBadge"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="top|end"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/bg_circle_icon_active"
+                    android:gravity="center"
+                    android:text="2"
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+
+            <!-- FEATURE ("লার্নিং মোড চালু করলে পুরো স্ক্রিনে ডার্ক থিম, মনে হবে অন্য কোথাও চলে এসেছি"):
+                 লার্নিং মোড অন থাকলে চ্যাট তালিকার ওপর এই ব্ল্যাকবোর্ড-স্টাইল লেয়ার আসে (MainActivity.
+                 applyLearningModeUi) — সাথে পুরো পেজ/স্ট্যাটাস বার/টপ বার ডার্ক হয়ে যায়। চ্যাট নিচে যেমন
+                 ছিল তেমনই থাকে; মোড বন্ধ করলেই ফিরে আসে। -->
+            <FrameLayout
+                android:id="@+id/learningVibeLayer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp">
+
+                    <ImageView
+                        android:id="@+id/learningVibeRobot"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:src="@drawable/robot_happy_front"
+                        android:contentDescription="Lenspilot robot" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="AI Learning Mode"
+                        android:textColor="@color/claude_text"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="22dp"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/learningLibCourse"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/bg_learning_chip_blue"
+                            android:gravity="center"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:text="📚\nCourse"
+                            android:textColor="@color/claude_text"
+                            android:textSize="13sp" />
+                        <TextView
+                            android:id="@+id/learningLibChapter"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/bg_learning_chip_violet"
+                            android:gravity="center"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:text="📖\nChapter"
+                            android:textColor="@color/claude_text"
+                            android:textSize="13sp" />
+                        <TextView
+                            android:id="@+id/learningLibSubject"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/bg_learning_chip_green"
+                            android:gravity="center"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:text="🧪\nSubject"
+                            android:textColor="@color/claude_text"
+                            android:textSize="13sp" />
+                        <TextView
+                            android:id="@+id/learningLibClass"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_learning_chip_orange"
+                            android:gravity="center"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:text="🏫\nClass"
+                            android:textColor="@color/claude_text"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/learningLibOpen"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_learning_chip_teal"
+                        android:gravity="center"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:text="▶ My playlist"
+                        android:textColor="@color/claude_text"
+                        android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/learningDetailLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:textColor="@color/claude_muted"
+                        android:textSize="12sp" />
+                    <SeekBar
+                        android:id="@+id/learningDetailSeek"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="9" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- v74: অটোমেশন ব্রাউজার মোডের খালি-চ্যাট স্ক্রিন — রোবট/ব্রাউজার-ছবি বাদ। পটভূমি স্বচ্ছ (পেজের রংই দেখায়),
+                 শুধু পরিচ্ছন্ন লেখা + "ফুল ব্রাউজার খুলুন" বোতাম। তথ্য দেওয়ার বক্স আর এখানে নেই — \"Open full browser\" বাটনের নিচের ছোট গোল আইকনে (v82)। -->
+            <FrameLayout
+                android:id="@+id/browserVibeLayer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingStart="32dp"
+                    android:paddingEnd="32dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Automation Browser"
+                        android:textColor="@color/claude_text"
+                        android:fontFamily="serif"
+                        android:textSize="26sp" />
+                    <LinearLayout
+                        android:id="@+id/browserOpenFullButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="22dp"
+                        android:background="@drawable/bg_claude_chip"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="9dp"
+                        android:paddingBottom="9dp"
+                        android:contentDescription="Open full browser">
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_browser_ai"
+                            android:tint="@color/claude_text"
+                            android:importantForAccessibility="no" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Open full browser"
+                            android:textColor="@color/claude_text"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                    <!-- v82: "এই কাজের তথ্য" আইকন এখন "Open full browser" বাটনের ঠিক নিচে, মাঝখানে (আগে নিচের ডান কোনায় ছিল)।
+                         বক্স/টেবিল আইকনের বদলে নরম গোল i-আইকন। দেখানো/লুকানো আগের মতোই MainActivity.refreshEmptyState। -->
+                    <FrameLayout
+                        android:id="@+id/browserInfoFab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:visibility="gone"
+                        android:contentDescription="Add information for this task">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/bg_claude_chip"
+                            android:foreground="?attr/selectableItemBackground"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="14dp"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp">
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_task_info"
+                                android:importantForAccessibility="no" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="Task details"
+                                android:textColor="@color/claude_text"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                        <TextView
+                            android:id="@+id/browserInfoBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="16dp"
+                            android:minWidth="16dp"
+                            android:layout_gravity="top|end"
+                            android:background="@drawable/bg_unread_badge"
+                            android:gravity="center"
+                            android:paddingStart="4dp"
+                            android:paddingEnd="4dp"
+                            android:textColor="@color/white"
+                            android:textSize="10sp"
+                            android:visibility="gone" />
+                    </FrameLayout>
+                </LinearLayout>
+            </FrameLayout>
+
+        </FrameLayout>
+
+        <!-- Screenshot attachment preview (Gemini-style "+" chip) — shown
+             only while an image is staged to go out with the next message. -->
+        <LinearLayout
+            android:id="@+id/attachmentPreviewRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="4dp"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="56dp"
+                android:layout_height="56dp">
+
+                <ImageView
+                    android:id="@+id/attachmentThumbnail"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/bg_input_field"
+                    android:contentDescription="Attached screenshot" />
+
+                <ImageButton
+                    android:id="@+id/attachmentRemoveButton"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="top|end"
+                    android:background="@drawable/bg_close_chip"
+                    android:padding="3dp"
+                    android:src="@drawable/ic_close"
+                    android:contentDescription="Remove attachment" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/attachmentFileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:maxWidth="240dp"
+                android:ellipsize="middle"
+                android:maxLines="2"
+                android:textColor="@color/claude_muted"
+                android:textSize="12sp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- v49: মাল্টি-এজেন্ট অপশন — মোড অন হলে (MainActivity.setMultiAgentMode) আসে: "Agents" লেবেল + ২..৫ চিপ।
+             চিপগুলো MainActivity কোডে বানায় (buildMultiAgentChips); বাছাই Prefs-এ থাকে, অনুরোধে "agent_count" হয়ে যায়। -->
+        <LinearLayout
+            android:id="@+id/multiAgentOptionsRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="6dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:background="@drawable/bg_auto_panel"
+            android:visibility="gone">
+            <TextView
+                android:id="@+id/multiAgentOptionsLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/ma_agents_label"
+                android:textColor="@color/auto_ink"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+            <LinearLayout
+                android:id="@+id/multiAgentCountChips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical" />
+        </LinearLayout>
+
+        <!-- Input row: attach (+) | text | mic (dictate) | send.
+             NOTE: toolbar icons are 32dp (were 34dp) so the new multi-agent button
+             fits on 360dp-wide phones without pushing mic/send off screen. -->
+        <!-- Claude/Gemini-style composer: full-width text box on top,
+             compact tool icons in their own row underneath — the old
+             single horizontal row (5 icons + EditText all side by side)
+             squeezed the writing area down to almost nothing on regular
+             phone widths. Same view ids as before, so MainActivity's
+             click listeners/logic need no changes. -->
+        <LinearLayout
+            android:id="@+id/composerBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="vertical"
+            android:background="@drawable/bg_input_field"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <EditText
+                android:id="@+id/messageInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:layout_marginTop="4dp"
+                android:minHeight="40dp"
+                android:background="@android:color/transparent"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:gravity="center_vertical"
+                android:hint="@string/chat_input_hint"
+                android:textColor="@color/text_primary_light"
+                android:textColorHint="@color/text_muted_light"
+                android:textSize="15sp"
+                android:maxLines="6"
+                android:scrollbars="vertical"
+                android:inputType="textMultiLine|textCapSentences" />
+
+            <!-- v37: বাটন-সারি ConstraintLayout + Flow — সব বাটন সমান ফাঁকে ছড়ানো (spread_inside), সেন্ড তিরচিহ্ন সবার
+                 ডানে সারির ভেতরেই (আগে বাটন বেশি হয়ে সেন্ড কিনারায় কেটে বিচ্ছিন্ন হতো)। নিচের মাইক বাদ — ওপরে ভয়েস কমান্ড বাটন
+                 আছে; micButton শুধু কোডের জন্য অদৃশ্য রাখা (visibility=gone, MainActivity কখনো দেখায় না)। বাটন GONE হলে (লার্নিং
+                 মোডে) Flow বাকিগুলো আবার সমানভাবে ছড়ায়। -->
+            <!-- v73: Claude-স্টাইল নিচের সারি — [+] [মডেল ▾] [মোড ▾] ········ [মাইক] [সেন্ড/স্টপ]।
+                 পুরনো মোড-বাটনগুলো নিচের legacyControls-এ লুকানো (id আর লিসনার একই, কোড ওগুলোকে ভেতরে ভেতরে ব্যবহার করে)। -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp">
+
+                <ImageButton
+                    android:id="@+id/attachButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_circle_icon"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_add"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:contentDescription="Add a screenshot of the problem" />
+
+                <!-- v86: Class শুধু 📚 আইকন (ছোট গোল) — লার্নিং মোডে মডেল/মোড চিপ আর ঢাকা পড়ে না, টেনে খুঁজতে হয় না -->
+                <TextView
+                    android:id="@+id/learningMakeClassButton"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_class_pill"
+                    android:gravity="center"
+                    android:text="📚"
+                    android:textColor="@color/text_primary_light"
+                    android:textSize="15sp"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toEndOf="@id/attachButton"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:contentDescription="Make a class plan" />
+
+                <!-- v86: চিপগুলো + এর ঠিক পরেই বাঁ দিক থেকে (bias 0) — ফাঁকা জায়গা চিপ আর মাইকের মাঝখানে, Claude-এর মতো -->
+                <HorizontalScrollView
+                    android:id="@+id/composerChipScroll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="14dp"
+                    android:overScrollMode="never"
+                    android:scrollbars="none"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@id/learningMakeClassButton"
+                    app:layout_constraintEnd_toStartOf="@id/micButton"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/systemChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_composer_chip"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:text="Super 1.2 ▾"
+                            android:textColor="@color/text_primary_light"
+                            android:textSize="12sp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="Choose model" />
+
+                        <TextView
+                            android:id="@+id/modeChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_composer_chip"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:text="Chat ▾"
+                            android:textColor="@color/text_primary_light"
+                            android:textSize="12sp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="Choose mode" />
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <ImageButton
+                    android:id="@+id/micButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/bg_circle_icon"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_mic"
+                    app:layout_constraintEnd_toStartOf="@id/sendButton"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:contentDescription="Voice command" />
+
+                <ImageButton
+                    android:id="@+id/sendButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_circle_icon_active"
+                    android:padding="9dp"
+                    android:src="@drawable/ic_send"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:contentDescription="@string/chat_send" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- কোডের ভেতরের ব্যবহারের জন্য — কখনো দেখা যায় না (parent GONE থাকলে ভেতরের visibility বদলালেও দেখা যায় না)। -->
+            <LinearLayout
+                android:id="@+id/legacyControls"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+                <ImageButton
+                    android:id="@+id/systemModeButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_circle_icon"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_steps_list"
+                    android:contentDescription="Choose system: Super Lite / Super 1.2" />
+                <ImageButton
+                    android:id="@+id/browserModeButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_circle_icon"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_browser_ai"
+                    android:contentDescription="AI browser mode" />
+                <ImageButton
+                    android:id="@+id/learningModeButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_circle_icon"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_learning_mode"
+                    android:contentDescription="AI learning mode" />
+                <ImageButton
+                    android:id="@+id/discussionModeButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_circle_icon"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_discussion"
+                    android:contentDescription="@string/cd_discussion_mode" />
+                <ImageButton
+                    android:id="@+id/multiAgentModeButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_circle_icon"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_multi_agent"
+                    android:contentDescription="@string/cd_multi_agent_mode" />
+                <ImageButton
+                    android:id="@+id/toolsModeButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_circle_icon"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_tools_mode"
+                    android:contentDescription="Tools mode (video editing)" />
+                <ImageButton
+                    android:id="@+id/automationModeButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_circle_icon"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_automation_world"
+                    android:contentDescription="AI Automation of the Real World" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <include
+        layout="@layout/overlay_voice_first"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- v75: Claude-স্টাইল সাইড-বার। বাঁ দিক থেকে স্লাইড করে আসে (টপ-বারের ☰ বা বাঁ কিনারা থেকে টেনে)।
+         ওপর থেকে নিচে: Lenspilot লেখা → ইনপুট/আউটপুট টোকেন + টোকেন আইকন → স্ক্রিন-রিড পদ্ধতি / কিবোর্ড / ব্রাউজার
+         → ছোট মোড-আইকন সারি (চাপলে সেই মোডের history নিচে দেখায়) → history তালিকা → একদম নিচে প্রোফাইল (+ নতুন চ্যাট)। -->
+    <LinearLayout
+        android:id="@+id/sideDrawer"
+        android:layout_width="316dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:orientation="vertical"
+        android:background="@color/claude_page_bg"
+        android:clickable="true"
+        android:focusable="true">
+
+        <!-- v91: ওপরে ডানে সার্চ আইকন — চাপলে নিচে লেখার ঘর খোলে, সব মোডের চ্যাট একসাথে খোঁজে -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="serif"
+                android:text="Lenspilot"
+                android:textColor="@color/claude_text"
+                android:textSize="28sp" />
+            <ImageButton
+                android:id="@+id/drawerSearchButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="9dp"
+                android:src="@drawable/ic_drawer_search"
+                android:contentDescription="Search chats" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/drawerSearchRow"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="10dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="6dp"
+            android:background="@drawable/bg_input_field"
+            android:visibility="gone">
+            <EditText
+                android:id="@+id/drawerSearchInput"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:hint="Search chats"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textColor="@color/text_primary_light"
+                android:textColorHint="@color/text_muted_light"
+                android:textSize="15sp" />
+            <ImageButton
+                android:id="@+id/drawerSearchClose"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@android:color/transparent"
+                android:padding="8dp"
+                android:src="@drawable/ic_close"
+                android:contentDescription="Close search" />
+        </LinearLayout>
+<!-- Token bar: current input/output balance + "get tokens" icon.
+             See com.hemel.lenspilot.ads (TokenWallet, RewardedAdManager,
+             AdBreakActivity) for the ad-reward economy behind this. -->
+        <LinearLayout
+            android:id="@+id/tokenBar"
+            
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="10dp">
+
+            <LinearLayout
+                android:id="@+id/tokenInfoCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_workflow_card"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
+
+                <TextView
+                    android:id="@+id/tokenInputText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Input: —"
+                    android:textColor="@color/text_secondary_light"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/tokenDivider"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="•"
+                    android:textColor="@color/border_light" />
+
+                <TextView
+                    android:id="@+id/tokenOutputText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Output: —"
+                    android:textColor="@color/text_secondary_light"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp">
+
+                <ImageButton
+                    android:id="@+id/getTokensButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_circle_icon"
+                    android:padding="7dp"
+                    android:src="@drawable/ic_token"
+                    android:contentDescription="@string/get_tokens_button" />
+
+                <View
+                    android:id="@+id/tokenLowDot"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="top|end"
+                    android:background="@drawable/bg_red_dot"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@color/auto_stroke" />
+
+        <LinearLayout
+            android:id="@+id/drawerOptScreenRead"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_agent_eye"
+                android:tint="@color/claude_text"
+                android:importantForAccessibility="no" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="18dp"
+                android:text="Screen reading method"
+                android:textColor="@color/claude_text"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/drawerOptKeyboard"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_keyboard"
+                android:tint="@color/claude_text"
+                android:importantForAccessibility="no" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="18dp"
+                android:text="Lenspilot keyboard"
+                android:textColor="@color/claude_text"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/drawerOptBrowser"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_browser_ai"
+                android:tint="@color/claude_text"
+                android:importantForAccessibility="no" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="18dp"
+                android:text="Lenspilot browser"
+                android:textColor="@color/claude_text"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/auto_stroke" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="13dp"
+            android:paddingEnd="13dp">
+
+            <ImageButton
+                android:id="@+id/drawerCatChat"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="9dp"
+                android:src="@drawable/ic_screen_guide"
+                android:contentDescription="Screen Guide history" />
+
+            <ImageButton
+                android:id="@+id/drawerCatBrowser"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="9dp"
+                android:src="@drawable/ic_browser_ai"
+                android:contentDescription="Automation Browser history" />
+
+            <ImageButton
+                android:id="@+id/drawerCatLearning"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="9dp"
+                android:src="@drawable/ic_learning_mode"
+                android:contentDescription="Learning history" />
+
+            <ImageButton
+                android:id="@+id/drawerCatDiscussion"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="9dp"
+                android:src="@drawable/ic_discussion"
+                android:contentDescription="Discussion history" />
+
+            <ImageButton
+                android:id="@+id/drawerCatMulti"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="9dp"
+                android:src="@drawable/ic_multi_agent"
+                android:contentDescription="Agents history" />
+
+            <ImageButton
+                android:id="@+id/drawerCatTools"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="9dp"
+                android:src="@drawable/ic_tools_mode"
+                android:contentDescription="Tools sessions" />
+
+            <ImageButton
+                android:id="@+id/drawerCatAutomation"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp"
+                android:background="@drawable/bg_circle_icon"
+                android:padding="9dp"
+                android:src="@drawable/ic_automation_world"
+                android:contentDescription="Automation agents" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/drawerHistoryTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="2dp"
+            android:textColor="@color/claude_muted"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/drawerHistoryList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp" />
+            <TextView
+                android:id="@+id/drawerHistoryEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="24dp"
+                android:gravity="center"
+                android:text="Nothing here yet"
+                android:textColor="@color/claude_muted"
+                android:textSize="14sp"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/auto_stroke" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
+            <LinearLayout
+                android:id="@+id/drawerProfileRow"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+                <TextView
+                    android:id="@+id/drawerAvatar"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_drawer_avatar"
+                    android:gravity="center"
+                    android:text="L"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/drawerProfileName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:textColor="@color/claude_text"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/drawerProfileSub"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:text="Profile &amp; settings"
+                        android:textColor="@color/claude_muted"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+            <TextView
+                android:id="@+id/drawerNewChat"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_drawer_new"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="18dp"
+                android:text="+ New chat"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.drawerlayout.widget.DrawerLayout>
