@@ -1,0 +1,1 @@
+- v125: LenspilotInputMethodService.kt:471 'Unresolved reference: it' fix (⋯ marks key lambda has no 'it')
