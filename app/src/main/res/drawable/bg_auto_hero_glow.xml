@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v49: AI ব্রাউজার হিরোর পেছনের নরম নীল আভা (হালকা থিম) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <gradient
+        android:type="radial"
+        android:gradientRadius="125dp"
+        android:startColor="#331E6BFF"
+        android:centerColor="#121E6BFF"
+        android:endColor="#001E6BFF" />
+</shape>

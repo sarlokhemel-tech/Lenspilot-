@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v49: "AI Automation of the Real World" আইকন — ষড়ভুজ (hexagon) ফ্রেম + মাঝখানে AI-কোর (রিং + বিন্দু) +
+     তিনটি সংযোগ-রেখা ষড়ভুজের তিন বাহুর নোডে (তিনটি ডিভাইস/মেশিন)। "একটি AI, অনেক ডিভাইস।"
+     আগের রোবট-আর্ম + নীল/সায়ান-তারা আইকন বাদ — ওটা বাকি আইকনের সাথে বেমানান রঙের ছিল।
+     রং: বাকি টুলবার-আইকনের মতোই text_primary_light (MainActivity সক্রিয় অবস্থায় সাদা tint করে;
+     হাব-পেজের হিরো/কার্ডে সাদা filter বসে)। -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <!-- বাইরের ষড়ভুজ -->
+    <path android:fillColor="#00000000" android:strokeColor="@color/text_primary_light"
+        android:strokeWidth="1.7" android:strokeLineJoin="round" android:strokeLineCap="round"
+        android:pathData="M12,2.4 L20.31,7.2 L20.31,16.8 L12,21.6 L3.69,16.8 L3.69,7.2 Z" />
+    <!-- কোর থেকে তিন নোডে সংযোগ -->
+    <path android:fillColor="#00000000" android:strokeColor="@color/text_primary_light"
+        android:strokeWidth="1.5" android:strokeLineCap="round"
+        android:pathData="M15.8,12 L20.31,12 M10.1,15.29 L7.845,19.197 M10.1,8.71 L7.845,4.803" />
+    <!-- AI-কোর রিং -->
+    <path android:fillColor="#00000000" android:strokeColor="@color/text_primary_light"
+        android:strokeWidth="1.6"
+        android:pathData="M12,12 m-3.8,0 a3.8,3.8 0 1,0 7.6,0 a3.8,3.8 0 1,0 -7.6,0" />
+    <!-- কোর বিন্দু -->
+    <path android:fillColor="@color/text_primary_light"
+        android:pathData="M12,12 m-1.4,0 a1.4,1.4 0 1,0 2.8,0 a1.4,1.4 0 1,0 -2.8,0" />
+    <!-- তিন নোড (ডিভাইস) -->
+    <path android:fillColor="@color/text_primary_light"
+        android:pathData="M20.31,12 m-1.7,0 a1.7,1.7 0 1,0 3.4,0 a1.7,1.7 0 1,0 -3.4,0 M7.845,19.197 m-1.7,0 a1.7,1.7 0 1,0 3.4,0 a1.7,1.7 0 1,0 -3.4,0 M7.845,4.803 m-1.7,0 a1.7,1.7 0 1,0 3.4,0 a1.7,1.7 0 1,0 -3.4,0" />
+</vector>
