@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v79: Perplexity-স্টাইল "পরের প্রশ্ন" — ELA 1st / ELA 4N উত্তরের নিচে। সারিগুলো ChatAdapter.bindFollowups ভরে। -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/followupsBox"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginStart="4dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="8dp" />
