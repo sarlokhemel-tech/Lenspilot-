@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lenspilot Keyboard's own view. This is a NORMAL IME layout — the
+     letter/number keys behave exactly like Google Keyboard (tap to type,
+     shift, backspace, space, enter). No Accessibility permission is used
+     or needed anywhere in this file or the service that inflates it.
+
+     The AI part is fully AUTOMATIC, not a manual "type a prompt" panel:
+     as soon as a text field is focused, if the AI toggle is ON and there
+     is context to go on (the active workflow goal, the field's hint, the
+     app), Lenspilot Keyboard decides what to type on its own and commits
+     it — the user never types a prompt into the keyboard itself. The top
+     row only ever needs to show three things: whether AI auto-typing is
+     currently ON/OFF (tap to pause and take over manually), a Stop
+     button while it's actively typing, and a status line for "thinking"
+     / "needs an answer, use the control bar mic" / "paused, you're
+     typing". There is deliberately NO mic/voice button in this keyboard
+     — voice answers to a clarifying question go through the overlay
+     control bar's own mic (see FallbackGuideService /
+     LenspilotAccessibilityService), never through a second, duplicate
+     mic here. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/keyboardRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/surface_light"
+    android:paddingTop="4dp"
+    android:paddingBottom="6dp">
+
+    <!-- ===================== v127: স্ক্রল-করা টুলবার (Gboard-এর মতো), বড় বাটন ও বড় লেখা =====================
+         ⊞ আর মাইক ডান-বাঁয়ে স্থির; মাঝের আইকনের সারি সোয়াইপ করে স্ক্রল করা যায় — তাই সব বাটন বড় হলেও কিছু কাটা পড়ে না।
+         লেখার সময় আইকনের সারি সরে গিয়ে বাংলা শব্দ-সাজেশন আসে। -->
+    <LinearLayout
+        android:id="@+id/topRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginBottom="2dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/kbMainButton"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/bg_keyboard_key_special"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:textSize="20sp"
+            android:textColor="@color/text_primary_light"
+            android:text="⊞"
+            android:clickable="true"
+            android:focusable="false"
+            android:contentDescription="@string/cd_keyboard_main" />
+
+        <HorizontalScrollView
+            android:id="@+id/toolScroll"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scrollbars="none"
+            android:overScrollMode="never">
+
+        <LinearLayout
+            android:id="@+id/toolIcons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/kbGlobeButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_keyboard_key_special"
+                android:padding="9dp"
+                android:src="@drawable/ic_keyboard_globe"
+                android:contentDescription="@string/cd_keyboard_globe" />
+
+            <TextView
+                android:id="@+id/kbBanglaToggleButton"
+                android:layout_width="46dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_keyboard_key_special"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary_light"
+                android:text="বাং"
+                android:clickable="true"
+                android:focusable="false" />
+
+            <!-- AI চালু/বন্ধ সুইচ: চালু = নীল পিল, বন্ধ = ধূসর পিল + কাটা "AI" -->
+            <LinearLayout
+                android:id="@+id/aiToggleButton"
+                android:layout_width="56dp"
+                android:layout_height="34dp"
+                android:layout_marginStart="6dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/bg_button_primary"
+                android:contentDescription="@string/cd_keyboard_ai_toggle">
+
+                <TextView
+                    android:id="@+id/aiToggleLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AI"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-medium" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/kbTranslateButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_keyboard_key_special"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:textSize="17sp"
+                android:textColor="@color/text_primary_light"
+                android:textStyle="bold"
+                android:text="文A"
+                android:clickable="true"
+                android:focusable="false"
+                android:contentDescription="@string/cd_keyboard_translate_mode" />
+
+            <TextView
+                android:id="@+id/kbClipButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_keyboard_key_special"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:textSize="20sp"
+                android:textColor="@color/text_primary_light"
+                
+                android:text="📋"
+                android:clickable="true"
+                android:focusable="false"
+                android:contentDescription="@string/cd_kb_clipboard" />
+
+            <TextView
+                android:id="@+id/kbEmojiButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_keyboard_key_special"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:textSize="20sp"
+                android:textColor="@color/text_primary_light"
+                
+                android:text="😊"
+                android:clickable="true"
+                android:focusable="false"
+                android:contentDescription="@string/cd_kb_emoji" />
+
+            <TextView
+                android:id="@+id/kbEditButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_keyboard_key_special"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:textSize="22sp"
+                android:textColor="@color/text_primary_light"
+                android:textStyle="bold"
+                android:text="✎"
+                android:clickable="true"
+                android:focusable="false"
+                android:contentDescription="@string/cd_kb_edit" />
+
+            <TextView
+                android:id="@+id/kbOneHandButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_keyboard_key_special"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:textSize="20sp"
+                android:textColor="@color/text_primary_light"
+                
+                android:text="🖐"
+                android:clickable="true"
+                android:focusable="false"
+                android:contentDescription="@string/cd_kb_onehand" />
+
+            <TextView
+                android:id="@+id/kbChatButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_keyboard_key_special"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:textSize="20sp"
+                android:textColor="@color/text_primary_light"
+                
+                android:text="💬"
+                android:clickable="true"
+                android:focusable="false"
+                android:contentDescription="@string/cd_keyboard_chat" />
+
+            <TextView
+                android:id="@+id/kbThemeButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_keyboard_key_special"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:textSize="20sp"
+                android:textColor="@color/text_primary_light"
+                
+                android:text="🎨"
+                android:clickable="true"
+                android:focusable="false"
+                android:contentDescription="@string/cd_keyboard_theme" />
+
+            <TextView
+                android:id="@+id/kbSettingsButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_keyboard_key_special"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:textSize="22sp"
+                android:textColor="@color/text_primary_light"
+                
+                android:text="⚙"
+                android:clickable="true"
+                android:focusable="false"
+                android:contentDescription="@string/cd_keyboard_tools" />
+
+            <ImageButton
+                android:id="@+id/kbLastReplyButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_keyboard_key_special"
+                android:padding="9dp"
+                android:src="@drawable/ic_history"
+                android:contentDescription="@string/keyboard_ai_use_last_reply" />
+        </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- লেখার সময়ই শুধু দেখা যায় — বাংলা শব্দ-সাজেশন -->
+        <LinearLayout
+            android:id="@+id/suggestionBar"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_keyboard_key_special"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/kbSuggestion1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textSize="17sp"
+                android:textColor="@color/text_primary_light"
+                android:clickable="true"
+                android:focusable="false" />
+
+            <TextView
+                android:id="@+id/kbSuggestion2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textSize="17sp"
+                android:textColor="@color/text_primary_light"
+                android:clickable="true"
+                android:focusable="false" />
+
+            <TextView
+                android:id="@+id/kbSuggestion3"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textSize="17sp"
+                android:textColor="@color/text_primary_light"
+                android:clickable="true"
+                android:focusable="false" />
+        </LinearLayout>
+
+        <!-- AI লেখার সময়ই শুধু দেখা যায় — ঘর আবার ইউজারকে ফিরিয়ে দেয় -->
+        <ImageButton
+            android:id="@+id/kbStopButton"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/bg_keyboard_key_special"
+            android:padding="9dp"
+            android:src="@drawable/ic_stop"
+            android:contentDescription="@string/keyboard_ai_stop"
+            android:visibility="gone" />
+
+        <!-- ডান কোণে মাইক (ভয়েস টাইপ) -->
+        <ImageButton
+            android:id="@+id/kbMicButton"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/bg_keyboard_key_special"
+            android:padding="9dp"
+            android:src="@drawable/ic_mic"
+            android:contentDescription="@string/cd_keyboard_mic" />
+    </LinearLayout>
+
+    <!-- Status line: "AI ভাবছে…", a clarifying question + "control bar
+         মাইকে বলো" hint, or "AI বন্ধ আছে, তুমি লিখছো" — visible only
+         when there's something to say, blank/gone the rest of the time. -->
+    <TextView
+        android:id="@+id/kbStatusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        android:textSize="14sp"
+        android:textColor="@color/text_secondary_light"
+        android:gravity="center"
+        android:visibility="gone" />
+
+    <!-- Letter/number rows are added here programmatically (see
+         LenspilotInputMethodService.buildKeyRows) — plain weighted rows
+         of keys, same idea as any QWERTY keyboard. -->
+    <LinearLayout
+        android:id="@+id/keysContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="2dp"
+        android:paddingEnd="2dp" />
+
+</LinearLayout>
