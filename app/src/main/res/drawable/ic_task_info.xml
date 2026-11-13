@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v86: "কাজের তথ্য" আইকন — পেন্সিলসহ নোট/ফর্ম (আগের ⓘ ভুল-বোঝা চিহ্ন বাদ) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#00000000" android:strokeColor="@color/text_primary_light"
+        android:strokeWidth="1.7" android:strokeLineJoin="round" android:strokeLineCap="round"
+        android:pathData="M6,3.5 H14 L18.5,8 V19 A1.5,1.5 0 0 1 17,20.5 H6 A1.5,1.5 0 0 1 4.5,19 V5 A1.5,1.5 0 0 1 6,3.5 Z" />
+    <path android:fillColor="#00000000" android:strokeColor="@color/text_primary_light"
+        android:strokeWidth="1.7" android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:pathData="M14,3.5 V8 H18.5" />
+    <path android:fillColor="#00000000" android:strokeColor="@color/text_primary_light"
+        android:strokeWidth="1.7" android:strokeLineCap="round"
+        android:pathData="M8,12.5 H15 M8,16 H12.5" />
+</vector>
