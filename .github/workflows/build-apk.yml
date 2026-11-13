@@ -1,0 +1,94 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ "**" ]
+  workflow_dispatch: {}
+
+# একই branch-এ নতুন push এলে আগের (অসমাপ্ত) build বাতিল — Termux থেকে পরপর push করলে সময় বাঁচে
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  # সার্ভার (app.py) দ্রুত যাচাই — APK build-এর সাথে সমান্তরালে চলে, build আটকায় না
+  server-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # জব-স্তরে continue-on-error নেই: py_compile ও Tools Mode সিমুলেশন ব্যর্থ হলে রান লাল দেখায় (APK build আলাদা জব, আটকায় না)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: pip install flask requests numpy matplotlib firebase-admin google-auth
+      - name: app.py syntax
+        run: python -m py_compile app.py
+      - name: Intent / prompt / screen-block tests
+        if: hashFiles('tests/intent_and_prompt_test.py') != ''
+        continue-on-error: true      # আগের আচরণ অপরিবর্তিত: এই পুরনো টেস্ট আগের মতোই আটকায় না
+        run: PYTHONPATH=. python tests/intent_and_prompt_test.py
+      - name: Guide v2 smoke test
+        if: hashFiles('tests/guide_v2_smoke_test.py') != ''
+        continue-on-error: true      # আগের আচরণ অপরিবর্তিত
+        run: PYTHONPATH=. python tests/guide_v2_smoke_test.py
+      - name: Tools Mode simulation (plan/decide/learn, long-run, leak test, seed recipes)
+        # `if: hashFiles` ইচ্ছে করে নেই — ফাইল হারালে নিঃশব্দে বাদ না পড়ে লাল হবে
+        timeout-minutes: 3           # সিমুলেশন ১০ সেকেন্ডের কম; আটকে গেলে দৃশ্যমান ব্যর্থতা
+        run: PYTHONPATH=. python tests/tools_mode_sim.py
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'gradle.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Accept Android SDK licenses
+        run: yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Upload APK as build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lenspilot-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Create GitHub Release with APK
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Lenspilot build ${{ github.run_number }}
+          files: app/build/outputs/apk/debug/*.apk
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

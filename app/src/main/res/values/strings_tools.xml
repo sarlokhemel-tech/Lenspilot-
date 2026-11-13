@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- সিস্টেম ও এআই-এর নাম — এক জায়গা থেকেই বদলানো যাবে -->
+    <string name="elora_name" translatable="false">ELORA</string>
+
+    <string name="tools_greeting_morning">Good morning</string>
+    <string name="tools_greeting_noon">Good day</string>
+    <string name="tools_greeting_afternoon">Good afternoon</string>
+    <string name="tools_greeting_evening">Good evening</string>
+    <string name="tools_greeting_night">Good night</string>
+    <string name="tools_greeting_format">%1$s! What should I do today?</string>
+
+    <string name="tools_opt_browser">Browser</string>
+    <string name="tools_opt_shell">Shell</string>
+    <string name="tools_opt_storage">Storage</string>
+    <string name="tools_sessions">Sessions</string>
+    <string name="tools_close">Close</string>
+    <string name="tools_send">Send</string>
+    <string name="tools_input_hint">Describe your goal…</string>
+    <string name="tools_soon">Coming in the next step</string>
+    <string name="tools_status_planning">%1$s: planning is coming in the next step — the task is saved in the session for now.</string>
+    <string name="tools_note_saved">Goal saved — planning comes in the next step</string>
+    <string name="tools_session_default_title">New task</string>
+    <string name="tools_session_create_failed">Couldn\'t create session: %1$s</string>
+
+    <string name="tools_state_idle">Idle</string>
+    <string name="tools_state_running">Running</string>
+    <string name="tools_state_waiting">Waiting</string>
+    <string name="tools_state_needs_you">Needs you</string>
+    <string name="tools_state_done">Done</string>
+    <string name="tools_state_failed">Failed</string>
+
+    <string name="tools_sessions_title">Task sessions</string>
+    <string name="tools_sessions_empty">No sessions yet.</string>
+    <string name="tools_session_delete_title">Delete session?</string>
+    <string name="tools_session_delete_msg">\"%1$s\" and all its files will be deleted.</string>
+
+    <string name="tools_storage_title">Storage</string>
+    <string name="tools_storage_root">Storage</string>
+    <string name="tools_storage_empty">Nothing here. Add files with the upload button above.</string>
+    <string name="tools_storage_search_hint">Search by name…</string>
+    <string name="tools_storage_search_empty">Nothing found.</string>
+    <string name="tools_upload">Upload file</string>
+    <string name="tools_search">Search</string>
+    <string name="tools_new_folder">New folder</string>
+    <string name="tools_back">Back</string>
+    <string name="tools_upload_result">Upload: %1$d succeeded, %2$d failed</string>
+    <string name="tools_act_download">Download to phone</string>
+    <string name="tools_act_share">Share</string>
+    <string name="tools_act_rename">Rename</string>
+    <string name="tools_act_delete">Delete</string>
+    <string name="tools_act_extract">Extract here</string>
+    <string name="tools_act_zip">Create ZIP</string>
+    <string name="tools_downloaded">Saved to Downloads: %1$s</string>
+    <string name="tools_extracted">%1$d items extracted</string>
+    <string name="tools_zipped">ZIP created: %1$s</string>
+    <string name="tools_delete_title">Delete?</string>
+    <string name="tools_delete_msg">\"%1$s\" will be permanently deleted.</string>
+    <string name="tools_rename_title">Rename</string>
+    <string name="tools_new_folder_title">New folder</string>
+    <string name="tools_folder_name_hint">Folder name</string>
+    <string name="tools_ok">OK</string>
+    <string name="tools_cancel">Cancel</string>
+    <string name="tools_close_preview">Close</string>
+    <string name="tools_no_preview">No preview available for this file</string>
+    <string name="tools_preview_truncated">\n\n… (rest not shown)</string>
+    <string name="tools_share_chooser">Share file</string>
+    <string name="tools_err_generic">Couldn\'t complete the task: %1$s</string>
+    <string name="tools_attach">Add files (Storage)</string>
+    <string name="tools_mode_chip">Workspace ▾</string>
+    <string name="tools_mode_chip_desc">Choose a workspace</string>
+    <string name="tools_pick_title">Open a workspace</string>
+    <string name="tools_pick_browser_sub">In-app automation browser</string>
+    <string name="tools_pick_shell_sub">Git and basic commands</string>
+    <string name="tools_pick_storage_sub">Your files and downloads</string>
+</resources>
