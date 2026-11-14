@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v56: লার্নিং মোডের চিপ — মেইন পেজের মতো সাদা ভরাট, শুধু বর্ডার রঙিন -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/surface_elevated_light" />
+    <stroke android:width="1.5dp" android:color="#14B8A6" />
+    <corners android:radius="18dp" />
+</shape>
