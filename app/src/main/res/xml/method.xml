@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Declares Lenspilot Keyboard as a normal input method (IME) to Android.
+     This is what makes it show up under
+     Settings -> System -> Languages & input -> On-screen keyboard,
+     exactly like Gboard/SwiftKey do — no Accessibility permission
+     involved anywhere in this file or in enabling/using this keyboard. -->
+<input-method xmlns:android="http://schemas.android.com/apk/res/android"
+    android:settingsActivity="com.hemel.lenspilot.MainActivity">
+    <subtype
+        android:label="@string/keyboard_subtype_english"
+        android:imeSubtypeLocale="en_US"
+        android:imeSubtypeMode="keyboard" />
+    <subtype
+        android:label="@string/keyboard_subtype_bangla"
+        android:imeSubtypeLocale="bn_BD"
+        android:imeSubtypeMode="keyboard" />
+</input-method>

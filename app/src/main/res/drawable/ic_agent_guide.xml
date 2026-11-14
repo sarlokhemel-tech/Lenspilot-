@@ -1,0 +1,6 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <!-- v55: Guide চিপের আইকন — আগে 🧭 ইমোজি ছিল, যেটা অনেক ফোনে ঘড়ির মতো দেখায়। এখন পরিষ্কার নেভিগেশন-তীর। -->
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M12,2 L4.5,20.29 L5.21,21 L12,18 L18.79,21 L19.5,20.29 Z" />
+</vector>
