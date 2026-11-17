@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- github_run detector-এর ডিফল্ট API ঠিকানা। এক জায়গায় রাখা, কোডে বসানো নেই; detector-এ api_base দিয়ে বদলানো যায়। -->
+    <string name="runner_github_api_base" translatable="false">https://api.github.com</string>
+</resources>

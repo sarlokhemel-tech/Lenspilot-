@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v88: AI বাবল — bg_live_glass_card-এর একই কাচ, কিন্তু মেইন চ্যাটের bg_bubble_ai-এর মতো নিচে-বাঁয়ে ছোট কোণ।
+     (bg_live_glass_card হিন্ট/পারমিশন/ডায়ালগে আগের মতোই থাকে।) -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:angle="270" android:startColor="#B36B7587" android:endColor="#AD586172" />
+            <stroke android:width="1dp" android:color="#73FFFFFF" />
+            <corners android:topLeftRadius="22dp" android:topRightRadius="22dp"
+                android:bottomRightRadius="22dp" android:bottomLeftRadius="6dp" />
+        </shape>
+    </item>
+    <item android:top="1dp" android:left="1dp" android:right="1dp" android:bottom="26dp">
+        <shape android:shape="rectangle">
+            <gradient android:angle="270" android:startColor="#33FFFFFF" android:endColor="#00FFFFFF" />
+            <corners android:topLeftRadius="21dp" android:topRightRadius="21dp" />
+        </shape>
+    </item>
+</layer-list>

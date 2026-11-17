@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- অটোমেশন ব্রাউজারের লাইভ চ্যাট (v87: মেইন UI-এর গ্লাস রূপ): ফুল-স্ক্রিন গ্লাস কার্ড। সব লেখা সাদা; পেছনের ব্রাউজার ঝাপসা
+     কাচের ভেতর দিয়ে দেখা যায় (ডায়ালগ-উইন্ডোর dim/blur)। উপরে ডানে × = চ্যাট থেকে বেরোনো। -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="10dp">
+
+    <!-- v87: হেডার = মেইন চ্যাটের টপ বারের গ্লাস রূপ (বাঁয়ে সাইডবার, ডানে ✕; অটোমেশন ব্রাউজারে 👁 নেই)।
+         LiveChatDialog এখানে GlassMain.topBar বসায়। -->
+    <FrameLayout
+        android:id="@+id/liveChatTopHolder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ScrollView
+        android:id="@+id/liveChatScroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:fillViewport="false"
+        android:scrollbars="none"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:id="@+id/liveChatList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="4dp"
+            android:paddingBottom="8dp" />
+    </ScrollView>
+
+    <!-- এজেন্ট এই মুহূর্তে কী করছে (ব্রাউজারের স্ট্যাটাস লাইভ) -->
+    <TextView
+        android:id="@+id/liveChatStatusChip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:background="@drawable/bg_live_glass_card"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/liveChatImagePreviewRow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:layout_width="56dp"
+            android:layout_height="56dp">
+
+            <ImageView
+                android:id="@+id/liveChatImagePreview"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_live_glass_card" />
+
+            <ImageButton
+                android:id="@+id/liveChatImageRemove"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="top|end"
+                android:background="@drawable/bg_live_glass_circle_active"
+                android:padding="4dp"
+                android:src="@drawable/ic_close_white"
+                android:contentDescription="Remove image" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- v90: মডেল বাছাইয়ের তালিকা (সাদা শিট) কম্পোজারের ওপরে ভাসে — LiveChatDialog.togglePicker -->
+    <FrameLayout
+        android:id="@+id/liveChatPick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:visibility="gone" />
+
+    <!-- v90: লেখার জায়গা = ভাসমান AI Agent প্যানেলের হুবহু: ওপরে "Type…", নিচের সারিতে [+] [মডেল ▾] ········ [মাইক] [সেন্ড]।
+         (মোড-চিপ নেই — এটা অটোমেশন ব্রাউজারের নিজস্ব চ্যাট।) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_live_glass_input"
+        android:padding="6dp">
+
+        <EditText
+            android:id="@+id/liveChatInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginTop="4dp"
+            android:minHeight="40dp"
+            android:background="@null"
+            android:gravity="center_vertical"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:hint="@string/chat_input_hint"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#B3FFFFFF"
+            android:textSize="15sp"
+            android:maxLines="6"
+            android:imeOptions="actionSend"
+            android:inputType="textMultiLine|textCapSentences" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingTop="2dp">
+
+            <ImageButton
+                android:id="@+id/liveChatAttachButton"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_live_glass_circle"
+                android:tint="#FFFFFF"
+                android:padding="8dp"
+                android:src="@drawable/ic_add"
+                android:contentDescription="Attach image" />
+
+            <HorizontalScrollView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="6dp"
+                android:overScrollMode="never"
+                android:scrollbars="none">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/liveChatModelChip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:background="@drawable/bg_live_glass_chip"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:text="Super 1.2 ▾"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Choose model" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <ImageButton
+                android:id="@+id/liveChatMicButton"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_live_glass_circle"
+                android:padding="8dp"
+                android:src="@drawable/ic_mic_white"
+                android:contentDescription="Speak" />
+
+            <ImageButton
+                android:id="@+id/liveChatSendButton"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_live_glass_circle_active"
+                android:padding="11dp"
+                android:src="@drawable/ic_send_white"
+                android:contentDescription="Send" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

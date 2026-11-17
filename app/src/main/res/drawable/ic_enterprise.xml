@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v130: সাইড-বারের "Enterprise automation" আইকন — অফিস-ভবন (বাকি সাইড-বার আইকনের মতো লাইন-স্টাইল; রং claude_text tint দিয়ে বসে)। -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <!-- ভবনের বডি -->
+    <path android:fillColor="#00000000" android:strokeColor="#1F1E1D"
+        android:strokeWidth="1.7" android:strokeLineJoin="round" android:strokeLineCap="round"
+        android:pathData="M4,21 L4,5 Q4,3.5 5.5,3.5 L12.5,3.5 Q14,3.5 14,5 L14,21 M14,9.5 L18.5,9.5 Q20,9.5 20,11 L20,21 M2.5,21 L21.5,21" />
+    <!-- জানালা -->
+    <path android:fillColor="#00000000" android:strokeColor="#1F1E1D"
+        android:strokeWidth="1.6" android:strokeLineCap="round"
+        android:pathData="M7.5,7.5 L10.5,7.5 M7.5,11 L10.5,11 M7.5,14.5 L10.5,14.5 M17,13.5 L17,13.6 M17,17 L17,17.1" />
+</vector>

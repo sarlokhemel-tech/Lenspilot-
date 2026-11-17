@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tools মোড (ELORA) হোম: চ্যাট-স্টাইল, সাদা ব্যাকগ্রাউন্ড। প্রথম মেসেজ পাঠালে ELORA ও শুভেচ্ছা মিলিয়ে যায়,
+     তিনটি অপশন-আইকন উপরের বারে উঠে যায়। clipChildren=false — অ্যানিমেশনে আইকন প্যারেন্টের বাইরে আঁকতে হয়। -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/toolsRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/claude_page_bg"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/toolsTopBar"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="4dp">
+
+        <ImageButton
+            android:id="@+id/toolsClose"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/tools_close"
+            android:padding="12dp"
+            android:src="@drawable/ic_tools_close" />
+
+        <FrameLayout
+            android:id="@+id/toolsSlot"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false" />
+
+        <ImageButton
+            android:id="@+id/toolsSecurity"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/tools_security"
+            android:padding="12dp"
+            android:src="@drawable/ic_tools_lock" />
+
+        <ImageButton
+            android:id="@+id/toolsSessions"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/tools_sessions"
+            android:padding="12dp"
+            android:src="@drawable/ic_tools_sessions" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/toolsContent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:id="@+id/toolsHome"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp">
+
+            <com.hemel.lenspilot.tools.EloraTitleView
+                android:id="@+id/toolsEloraTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.18"
+                android:paddingStart="14dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="4dp"
+                android:paddingBottom="12dp"
+                android:text="@string/elora_name"
+                android:textColor="@color/primary_action"
+                android:textSize="52sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/toolsGreeting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:textColor="@color/text_secondary_light"
+                android:textSize="17sp" />
+
+            <LinearLayout
+                android:id="@+id/toolsOptionRow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:gravity="center"
+                android:orientation="horizontal" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/toolsChat"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ScrollView
+                android:id="@+id/toolsChatScroll"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:id="@+id/toolsChatList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp" />
+            </ScrollView>
+
+            <TextView
+                android:id="@+id/toolsStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="8dp"
+                android:textColor="@color/text_secondary_light"
+                android:textSize="13sp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Same composer as the main chat: text box on top, [+] ........ [send/stop] underneath. -->
+    <LinearLayout
+        android:id="@+id/toolsInputBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_input_field"
+        android:orientation="vertical"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <EditText
+            android:id="@+id/toolsInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="6dp"
+            android:background="@android:color/transparent"
+            android:gravity="center_vertical"
+            android:hint="@string/tools_input_hint"
+            android:inputType="textMultiLine|textCapSentences"
+            android:maxLines="6"
+            android:minHeight="40dp"
+            android:paddingStart="4dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="4dp"
+            android:paddingBottom="6dp"
+            android:scrollbars="vertical"
+            android:textColor="@color/text_primary_light"
+            android:textColorHint="@color/text_muted_light"
+            android:textSize="15sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/toolsAttach"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_circle_icon"
+                android:contentDescription="@string/tools_attach"
+                android:padding="8dp"
+                android:src="@drawable/ic_add" />
+
+            <!-- v86: Workspace বাছাই এখন ছোট 🗂 আইকন; তার পাশে সাধারণ চ্যাটের মতো মডেল ও মোড চিপ — টেনে দেখতে হয় না -->
+            <TextView
+                android:id="@+id/toolsModeChip"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_composer_chip"
+                android:clickable="true"
+                android:contentDescription="@string/tools_mode_chip_desc"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="🗂"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/toolsSystemChip"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_composer_chip"
+                android:clickable="true"
+                android:contentDescription="Choose model"
+                android:focusable="true"
+                android:gravity="center"
+                android:maxLines="1"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="Super 1.2 ▾"
+                android:textColor="@color/text_primary_light"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/toolsModeSwitchChip"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_composer_chip"
+                android:clickable="true"
+                android:contentDescription="Choose mode"
+                android:focusable="true"
+                android:gravity="center"
+                android:maxLines="1"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="Tools ▾"
+                android:textColor="@color/text_primary_light"
+                android:textSize="12sp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <ImageButton
+                android:id="@+id/toolsSend"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_circle_icon_active"
+                android:contentDescription="@string/tools_send"
+                android:padding="9dp"
+                android:src="@drawable/ic_send" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

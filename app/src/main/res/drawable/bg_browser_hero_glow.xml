@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AI ব্রাউজার হিরোর পেছনের নরম আভা -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <gradient
+        android:type="radial"
+        android:gradientRadius="125dp"
+        android:startColor="#337DD3E0"
+        android:centerColor="#127DD3E0"
+        android:endColor="#007DD3E0" />
+</shape>
